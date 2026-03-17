@@ -1,0 +1,1934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ArthQuest — Your Financial Adventure</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+/* ═══════════════════════════════════════════════
+   DESIGN TOKENS
+═══════════════════════════════════════════════ */
+:root {
+  --saffron:#FF6B00; --saffron-d:#CC5500; --saffron-l:#FFF3E8;
+  --green:#138808;   --green-d:#0A5C05;   --green-l:#E8F5E9;
+  --ruby:#C62828;    --ruby-l:#FFEBEE;
+  --gold:#D4AF37;    --gold-l:#FFFDE7;
+  --blue:#1565C0;    --blue-l:#E3F2FD;
+  --purple:#6A1B9A;  --purple-l:#F3E5F5;
+  --teal:#00695C;    --teal-l:#E0F2F1;
+  --brown:#5D4037;   --brown-l:#EFEBE9;
+  --bg:#ffffff; --bg2:#f8f7f4; --bg3:#f1efe8;
+  --border:rgba(0,0,0,0.1); --border-md:rgba(0,0,0,0.18);
+  --text:#1a1a1a; --text2:#666; --text3:#999;
+  --radius:14px; --radius-sm:8px; --radius-xs:6px;
+  --fh:'Baloo 2',sans-serif; --fb:'DM Sans',sans-serif;
+  --shadow:0 2px 12px rgba(0,0,0,0.08);
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --bg:#1a1a1a; --bg2:#242424; --bg3:#2e2e2e;
+    --border:rgba(255,255,255,0.1); --border-md:rgba(255,255,255,0.18);
+    --text:#f0f0f0; --text2:#aaa; --text3:#666;
+    --shadow:0 2px 12px rgba(0,0,0,0.3);
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   RESET & BASE
+═══════════════════════════════════════════════ */
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:var(--fb);color:var(--text);background:var(--bg3);min-height:100vh;font-size:14px}
+input,select,textarea,button{font-family:var(--fb);font-size:14px}
+input:focus,select:focus{outline:none;border-color:var(--saffron)!important}
+
+/* ═══════════════════════════════════════════════
+   LAYOUT
+═══════════════════════════════════════════════ */
+.app-wrap{max-width:680px;margin:0 auto;padding:0 0 80px}
+.page{display:none}.page.active{display:block}
+
+/* ═══════════════════════════════════════════════
+   HEADER
+═══════════════════════════════════════════════ */
+.app-header{background:var(--saffron);padding:16px 16px 12px;position:sticky;top:0;z-index:50}
+.header-row{display:flex;align-items:center;gap:10px}
+.header-logo{font-family:var(--fh);font-size:22px;font-weight:800;color:#fff;line-height:1}
+.header-sub{font-size:10px;color:rgba(255,255,255,.8);margin-top:1px}
+.header-xp{margin-left:auto;text-align:right;color:#fff}
+.xp-num{font-family:var(--fh);font-size:20px;font-weight:700;line-height:1}
+.xp-label{font-size:9px;text-transform:uppercase;letter-spacing:1px;opacity:.8}
+.level-chip{background:rgba(255,255,255,.2);border-radius:20px;padding:2px 9px;font-size:10px;font-weight:600;margin-top:3px;display:inline-block}
+.xp-bar-row{margin-top:10px;display:flex;align-items:center;gap:8px}
+.xp-track{flex:1;height:6px;background:rgba(255,255,255,.25);border-radius:3px;overflow:hidden}
+.xp-fill{height:100%;background:#fff;border-radius:3px;transition:width .6s ease}
+.xp-bar-label{font-size:10px;color:rgba(255,255,255,.8);white-space:nowrap}
+.header-time{color:#fff;font-size:11px;opacity:.85}
+
+/* ═══════════════════════════════════════════════
+   BOTTOM NAV
+═══════════════════════════════════════════════ */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--bg);border-top:0.5px solid var(--border);display:flex;z-index:100;max-width:680px;margin:0 auto;overflow-x:auto;scrollbar-width:none}
+.bottom-nav::-webkit-scrollbar{display:none}
+.nav-item{flex:1;min-width:48px;display:flex;flex-direction:column;align-items:center;padding:9px 4px 11px;cursor:pointer;transition:color .15s;color:var(--text3);border:none;background:none;font-family:var(--fb)}
+.nav-item.active{color:var(--saffron)}
+.nav-icon{font-size:20px;line-height:1;margin-bottom:3px}
+.nav-label{font-size:9px;font-weight:500}
+.nav-add-wrap{display:flex;flex-direction:column;align-items:center;flex:1;min-width:56px}
+.nav-add{width:48px;height:48px;background:var(--saffron);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:24px;cursor:pointer;border:none;margin-top:-18px;box-shadow:0 4px 16px rgba(255,107,0,.4);transition:transform .15s}
+.nav-add:hover{transform:scale(1.08)}
+
+/* ═══════════════════════════════════════════════
+   CARDS & SHARED
+═══════════════════════════════════════════════ */
+.section{padding:14px 14px 0}
+.card{background:var(--bg);border-radius:var(--radius);border:0.5px solid var(--border);padding:14px 15px;margin-bottom:12px;box-shadow:var(--shadow)}
+.card-head{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.card-title{font-family:var(--fh);font-size:15px;font-weight:700}
+.card-icon{font-size:18px;line-height:1}
+.card-action{margin-left:auto;font-size:12px;color:var(--saffron);cursor:pointer;font-weight:500;background:none;border:none;padding:0}
+
+.stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}
+.stat-grid-4{grid-template-columns:repeat(4,1fr)}
+.stat-box{background:var(--bg);border-radius:var(--radius-sm);border:0.5px solid var(--border);padding:11px 12px;box-shadow:var(--shadow)}
+.stat-label{font-size:10px;color:var(--text2);margin-bottom:3px}
+.stat-val{font-family:var(--fh);font-size:18px;font-weight:700}
+.stat-sub{font-size:10px;color:var(--text3);margin-top:2px}
+
+/* ═══════════════════════════════════════════════
+   FORM ELEMENTS
+═══════════════════════════════════════════════ */
+.fr{display:flex;gap:8px;margin-bottom:10px}
+.fg{flex:1;min-width:0}
+.fl{font-size:11px;color:var(--text2);margin-bottom:4px;display:block;font-weight:500}
+.fi{width:100%;padding:9px 11px;border:0.5px solid var(--border-md);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);font-size:13px}
+.fs{width:100%;padding:9px 11px;border:0.5px solid var(--border-md);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);font-size:13px;appearance:none}
+
+.btn{padding:9px 16px;border-radius:var(--radius-sm);border:0.5px solid var(--border-md);background:var(--bg2);color:var(--text);font-size:13px;cursor:pointer;font-weight:500;transition:all .15s}
+.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--saffron);color:#fff;border-color:var(--saffron)}
+.btn-primary:hover{background:var(--saffron-d)}
+.btn-green{background:var(--green);color:#fff;border-color:var(--green)}
+.btn-green:hover{background:var(--green-d)}
+.btn-danger{background:var(--ruby-l);color:var(--ruby);border-color:#EF9A9A}
+.btn-sm{padding:5px 10px;font-size:11px}
+.btn-full{width:100%}
+
+/* Type toggles — FIX: proper active state management */
+.type-toggle{display:flex;gap:6px;margin-bottom:12px}
+.type-btn{flex:1;padding:9px 5px;border-radius:var(--radius-sm);border:0.5px solid var(--border-md);background:var(--bg2);font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;color:var(--text2);text-align:center}
+.type-btn.t-exp{background:var(--ruby-l);color:var(--ruby);border-color:#EF9A9A}
+.type-btn.t-inc{background:var(--green-l);color:var(--green-d);border-color:#A5D6A7}
+.type-btn.t-tr{background:var(--blue-l);color:var(--blue);border-color:#90CAF9}
+
+/* ═══════════════════════════════════════════════
+   MODAL
+═══════════════════════════════════════════════ */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:400;align-items:flex-end;justify-content:center}
+.overlay.open{display:flex;animation:fadeIn .2s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.sheet{background:var(--bg);border-radius:20px 20px 0 0;padding:0;width:100%;max-width:500px;animation:slideUp .25s ease;max-height:92vh;overflow-y:auto}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.sheet-header{padding:16px 16px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:1}
+.sheet-title{font-family:var(--fh);font-size:17px;font-weight:700}
+.sheet-close{background:var(--bg2);border:none;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:16px;color:var(--text2);display:flex;align-items:center;justify-content:center}
+.sheet-body{padding:16px 16px 28px}
+
+/* ═══════════════════════════════════════════════
+   TRANSACTION ITEMS
+═══════════════════════════════════════════════ */
+.tx-item{display:flex;align-items:center;gap:10px;padding:10px 11px;border-radius:var(--radius-sm);cursor:pointer;transition:background .15s;margin-bottom:3px}
+.tx-item:hover{background:var(--bg2)}
+.tx-icon-wrap{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.tx-content{flex:1;min-width:0}
+.tx-title{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tx-meta{font-size:10px;color:var(--text2);margin-top:2px;display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.tm-chip{border-radius:10px;padding:1px 6px;font-size:9px;font-weight:600}
+.tx-right{text-align:right;flex-shrink:0}
+.tx-amount{font-size:13px;font-weight:700}
+.tx-hint{font-size:9px;color:var(--text3);margin-top:1px}
+.tx-color-bar{width:3px;border-radius:2px;align-self:stretch;flex-shrink:0}
+
+/* ═══════════════════════════════════════════════
+   BOSS BATTLE
+═══════════════════════════════════════════════ */
+.boss-card{border-radius:var(--radius);border:0.5px solid var(--border);padding:14px;margin-bottom:12px;background:var(--bg);box-shadow:var(--shadow)}
+.boss-hdr{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.boss-avatar{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.boss-name{font-family:var(--fh);font-size:15px;font-weight:700}
+.boss-sub{font-size:11px;color:var(--text2);margin-top:2px}
+.boss-hp-track{height:14px;background:var(--bg3);border-radius:7px;overflow:hidden;margin-bottom:8px;border:0.5px solid var(--border)}
+.boss-hp-fill{height:100%;border-radius:7px;transition:width .7s ease}
+.boss-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:12px}
+.boss-stat{background:var(--bg2);border-radius:var(--radius-xs);padding:7px 8px;text-align:center}
+.boss-stat-val{font-family:var(--fh);font-size:13px;font-weight:700}
+.boss-stat-label{font-size:9px;color:var(--text2);margin-top:1px}
+.boss-attack-btn{width:100%;padding:10px;border-radius:var(--radius-sm);border:none;background:var(--saffron);color:#fff;font-family:var(--fh);font-size:14px;font-weight:700;cursor:pointer;transition:background .15s}
+.boss-attack-btn:hover{background:var(--saffron-d)}
+.boss-defeated{background:var(--green-l);border:0.5px solid #A5D6A7;border-radius:var(--radius);padding:14px;text-align:center;margin-bottom:12px}
+
+/* ═══════════════════════════════════════════════
+   SAVINGS GARDEN
+═══════════════════════════════════════════════ */
+.bug-banner{display:none;background:var(--ruby-l);border:1.5px solid #EF9A9A;border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:12px;animation:shake .5s ease}
+.bug-banner.show{display:flex;align-items:flex-start;gap:10px}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-4px)}40%{transform:translateX(4px)}60%{transform:translateX(-2px)}80%{transform:translateX(2px)}}
+.bug-banner-title{font-family:var(--fh);font-size:14px;font-weight:700;color:#B71C1C}
+.bug-banner-sub{font-size:11px;color:#C62828;margin-top:2px;line-height:1.5}
+.garden-scene{background:linear-gradient(180deg,#E8F5E9 0%,#C8E6C9 100%);border-radius:var(--radius);border:0.5px solid #A5D6A7;padding:16px 12px 0;margin-bottom:12px;overflow:hidden}
+.plants-row{display:flex;gap:8px;align-items:flex-end;justify-content:center;min-height:180px;flex-wrap:wrap}
+.plant-wrap{display:flex;flex-direction:column;align-items:center;cursor:pointer;position:relative;transition:transform .2s;flex:1;max-width:100px}
+.plant-wrap:hover{transform:scale(1.05)}
+.plant-label-text{font-size:9px;font-weight:600;color:#2E7D32;text-align:center;margin-top:3px;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.plant-pct-text{font-size:9px;text-align:center;margin-top:1px}
+.plant-warning-icon{position:absolute;top:-6px;right:0;font-size:14px;animation:bob 1s ease infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+.soil-bar{height:26px;background:#8D6E63;border-radius:0 0 var(--radius) var(--radius);margin:8px -12px 0;position:relative}
+.soil-bar::before{content:'';position:absolute;top:0;left:0;right:0;height:7px;background:#6D4C41}
+.garden-legend{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.legend-item{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--text2)}
+.plant-list-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:0.5px solid var(--border)}
+.plant-list-item:last-child{border-bottom:none;padding-bottom:0}
+.plant-progress-bar{height:4px;background:var(--bg3);border-radius:2px;margin-top:5px;overflow:hidden}
+.plant-progress-fill{height:100%;border-radius:2px;transition:width .5s}
+.status-pill{display:inline-block;padding:2px 7px;border-radius:10px;font-size:9px;font-weight:600}
+
+/* ═══════════════════════════════════════════════
+   TEAMMATES
+═══════════════════════════════════════════════ */
+.teammate-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:10px;margin-bottom:12px}
+.tm-card{border-radius:var(--radius);border:0.5px solid var(--border);padding:13px 14px;background:var(--bg);cursor:pointer;transition:border-color .2s;position:relative;box-shadow:var(--shadow)}
+.tm-card:hover{border-color:var(--saffron)}
+.tm-avatar{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:9px}
+.tm-name{font-family:var(--fh);font-size:13px;font-weight:700}
+.tm-type{font-size:10px;color:var(--text2);margin-top:1px}
+.tm-balance{font-family:var(--fh);font-size:16px;font-weight:700;margin-top:7px}
+.tm-tx-count{font-size:10px;color:var(--text3);margin-top:2px}
+.tm-del-btn{position:absolute;top:8px;right:8px;background:none;border:none;font-size:14px;cursor:pointer;color:var(--text3);opacity:0;transition:opacity .15s;padding:2px}
+.tm-card:hover .tm-del-btn{opacity:1}
+.tm-icon-grid{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:4px}
+.tm-icon-opt{width:38px;height:38px;border-radius:var(--radius-sm);border:0.5px solid var(--border-md);display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;transition:all .15s;background:var(--bg2)}
+.tm-icon-opt.sel{border:2px solid var(--saffron);background:var(--saffron-l)}
+
+/* ═══════════════════════════════════════════════
+   BADGES
+═══════════════════════════════════════════════ */
+.badge-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:10px}
+.badge{border-radius:var(--radius);border:0.5px solid var(--border);padding:12px 8px;text-align:center;background:var(--bg2);position:relative;opacity:.35;transition:all .3s}
+.badge.earned{opacity:1;border-color:var(--gold);background:var(--gold-l)}
+.badge-icon-b{font-size:22px;line-height:1;margin-bottom:5px}
+.badge-name-b{font-size:10px;font-weight:600;color:var(--text)}
+.badge-earned-dot{position:absolute;top:6px;right:6px;width:6px;height:6px;background:var(--gold);border-radius:50%}
+
+/* ═══════════════════════════════════════════════
+   STREAK
+═══════════════════════════════════════════════ */
+.streak-row{display:flex;gap:5px;margin-top:8px;flex-wrap:wrap}
+.streak-day{width:24px;height:24px;border-radius:5px;border:0.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;color:var(--text3)}
+.streak-day.done{background:var(--saffron);border-color:var(--saffron);color:#fff}
+.streak-day.today{border:1.5px solid var(--saffron);color:var(--saffron)}
+
+/* ═══════════════════════════════════════════════
+   SCAN
+═══════════════════════════════════════════════ */
+.upload-zone{border:1.5px dashed var(--border-md);border-radius:var(--radius);padding:30px 20px;text-align:center;cursor:pointer;transition:border-color .2s;margin-bottom:12px}
+.upload-zone:hover{border-color:var(--saffron)}
+.scan-spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--saffron);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 10px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ═══════════════════════════════════════════════
+   BUDGET BARS
+═══════════════════════════════════════════════ */
+.budget-bar{height:6px;background:var(--bg3);border-radius:3px;margin-top:4px;overflow:hidden}
+.budget-bar-fill{height:100%;border-radius:3px;transition:width .5s}
+.budget-over{border:1.5px solid #EF9A9A;border-radius:var(--radius-xs);padding:3px 7px;font-size:9px;font-weight:700;color:var(--ruby);background:var(--ruby-l);display:inline-block;margin-left:6px}
+
+/* ═══════════════════════════════════════════════
+   SEARCH & FILTER
+═══════════════════════════════════════════════ */
+.search-bar{display:flex;gap:8px;margin-bottom:10px;align-items:center}
+.search-input{flex:1;padding:8px 12px;border:0.5px solid var(--border-md);border-radius:20px;background:var(--bg);color:var(--text);font-size:13px}
+.filter-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.filter-chip{padding:4px 12px;border-radius:14px;border:0.5px solid var(--border-md);font-size:11px;font-weight:500;cursor:pointer;background:var(--bg2);color:var(--text2);transition:all .15s}
+.filter-chip.active{background:var(--saffron);color:#fff;border-color:var(--saffron)}
+
+/* ═══════════════════════════════════════════════
+   ONBOARDING OVERLAY
+═══════════════════════════════════════════════ */
+.onboard-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:600;display:flex;align-items:center;justify-content:center;padding:20px}
+.onboard-card{background:var(--bg);border-radius:20px;padding:28px 24px;max-width:380px;width:100%;text-align:center}
+.onboard-logo{font-size:56px;margin-bottom:12px}
+.onboard-title{font-family:var(--fh);font-size:24px;font-weight:800;color:var(--saffron);margin-bottom:8px}
+.onboard-sub{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:22px}
+
+/* ═══════════════════════════════════════════════
+   RECURRING BANNER
+═══════════════════════════════════════════════ */
+.recurring-banner{background:var(--blue-l);border:1.5px solid #90CAF9;border-radius:var(--radius-sm);padding:11px 14px;margin-bottom:12px;display:none}
+.recurring-banner.show{display:flex;align-items:center;gap:10px}
+
+/* ═══════════════════════════════════════════════
+   EMI
+═══════════════════════════════════════════════ */
+.emi-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:0.5px solid var(--border)}
+.emi-item:last-child{border-bottom:none;padding-bottom:0}
+.emi-bar{height:4px;background:var(--bg3);border-radius:2px;margin-top:5px;overflow:hidden}
+.emi-bar-fill{height:100%;border-radius:2px;transition:width .5s}
+
+/* ═══════════════════════════════════════════════
+   QUEST, CAT, MISC
+═══════════════════════════════════════════════ */
+.quest-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--border)}
+.quest-item:last-child{border-bottom:none;padding-bottom:0}
+.quest-icon-wrap{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.quest-name{font-size:13px;font-weight:600}
+.quest-desc{font-size:10px;color:var(--text2);margin-top:2px}
+.quest-bar{height:5px;background:var(--bg3);border-radius:3px;overflow:hidden;margin-top:6px}
+.quest-bar-fill{height:100%;background:var(--saffron);border-radius:3px;transition:width .5s}
+.quest-xp{font-size:11px;font-weight:700;color:var(--saffron);white-space:nowrap;flex-shrink:0}
+.cat-bar{height:6px;background:var(--bg3);border-radius:3px;margin-top:4px;overflow:hidden}
+.cat-bar-fill{height:100%;border-radius:3px}
+.divider{height:0.5px;background:var(--border);margin:12px 0}
+.info-box{border-radius:var(--radius-sm);padding:9px 12px;margin-bottom:12px;font-size:12px;line-height:1.5}
+.simulate-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.empty{text-align:center;padding:28px 16px;color:var(--text2)}
+.empty-icon{font-size:32px;margin-bottom:8px}
+.empty-text{font-size:13px}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:10px 18px;border-radius:22px;font-size:12px;font-weight:500;opacity:0;transition:opacity .3s;pointer-events:none;z-index:9999;white-space:nowrap;max-width:90vw;text-align:center}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+
+<!-- ONBOARDING (shown once to new users) -->
+<div class="onboard-overlay" id="onboard-overlay" style="display:none">
+  <div class="onboard-card">
+    <div class="onboard-logo">🏆</div>
+    <div class="onboard-title">ArthQuest</div>
+    <div class="onboard-sub">Turn your finances into an adventure. Track income & expenses, battle debt bosses, grow a savings garden, and level up your money game!</div>
+    <button class="btn btn-primary btn-full" style="margin-bottom:10px;font-size:15px;padding:12px" onclick="onboard(true)">🎮 Load demo data — explore first</button>
+    <button class="btn btn-full" style="font-size:13px" onclick="onboard(false)">🚀 Start fresh — enter my own data</button>
+  </div>
+</div>
+
+<!-- APP HEADER -->
+<div class="app-header">
+  <div class="header-row">
+    <div>
+      <div class="header-logo">🏆 ArthQuest</div>
+      <div class="header-sub">Your financial adventure</div>
+    </div>
+    <div class="header-xp">
+      <div class="xp-label">Total XP</div>
+      <div class="xp-num" id="hdr-xp">0</div>
+      <div class="level-chip" id="hdr-level">Level 1 · Shishya</div>
+    </div>
+    <div class="header-time" id="header-time"></div>
+  </div>
+  <div class="xp-bar-row">
+    <div class="xp-track"><div class="xp-fill" id="xp-fill" style="width:0%"></div></div>
+    <div class="xp-bar-label" id="xp-bar-label">0 / 500 XP</div>
+  </div>
+</div>
+
+<div class="app-wrap">
+
+<!-- ════════════════════ DASHBOARD ════════════════════ -->
+<div class="page active" id="page-dashboard">
+<div class="section">
+
+  <!-- Recurring reminder banner -->
+  <div class="recurring-banner" id="recurring-banner">
+    <div style="font-size:22px">🔄</div>
+    <div style="flex:1">
+      <div style="font-family:var(--fh);font-size:13px;font-weight:700;color:var(--blue)">Recurring transactions due</div>
+      <div id="recurring-list-text" style="font-size:11px;color:#1565C0;margin-top:2px"></div>
+    </div>
+    <button class="btn btn-sm" onclick="logAllRecurring()">Log all</button>
+    <button class="btn btn-sm" style="margin-left:4px" onclick="dismissRecurring()">Dismiss</button>
+  </div>
+
+  <div class="stat-grid stat-grid-4" style="margin-top:14px">
+    <div class="stat-box"><div class="stat-label">Net worth</div><div class="stat-val" id="d-networth">₹0</div></div>
+    <div class="stat-box"><div class="stat-label">Income</div><div class="stat-val" id="d-income">₹0</div></div>
+    <div class="stat-box"><div class="stat-label">Expenses</div><div class="stat-val" id="d-expenses">₹0</div></div>
+    <div class="stat-box"><div class="stat-label">Savings rate</div><div class="stat-val" id="d-savings">0%</div><div class="stat-sub">Goal: 30%</div></div>
+  </div>
+
+  <!-- Streak -->
+  <div class="card">
+    <div class="card-head"><div class="card-icon">🔥</div><div class="card-title">Daily streak</div></div>
+    <div style="font-size:12px;color:var(--text2)">Log every day to keep your streak alive!</div>
+    <div class="streak-row" id="streak-row"></div>
+    <div style="margin-top:9px;font-size:12px;color:var(--text2)">Current streak: <span id="streak-count" style="font-weight:700;color:var(--saffron)">0 days</span></div>
+  </div>
+
+  <!-- Team snapshot -->
+  <div class="card">
+    <div class="card-head"><div class="card-icon">👥</div><div class="card-title">Team snapshot</div><button class="card-action" onclick="showPage('teammates')">Manage →</button></div>
+    <div id="d-team-snapshot"></div>
+  </div>
+
+  <!-- Category breakdown with budget indicators -->
+  <div class="card">
+    <div class="card-head"><div class="card-icon">📊</div><div class="card-title">Spending this month</div><button class="card-action" onclick="showPage('reports')">Reports →</button></div>
+    <div id="d-cat-breakdown"></div>
+  </div>
+
+  <!-- Recent transactions -->
+  <div class="card">
+    <div class="card-head"><div class="card-icon">⚡</div><div class="card-title">Recent transactions</div><button class="card-action" onclick="showPage('transactions')">See all →</button></div>
+    <div id="d-recent-txns"></div>
+  </div>
+
+</div>
+</div>
+
+<!-- ════════════════════ TRANSACTIONS ════════════════════ -->
+<div class="page" id="page-transactions">
+<div class="section" style="padding-top:14px">
+  <div class="info-box" style="background:var(--saffron-l);border:0.5px solid #FFD0A8">
+    Tap any transaction to <strong style="color:var(--saffron)">edit or delete</strong> it. Use the + button to add new ones.
+  </div>
+  <!-- FIX: Search and filter (new feature) -->
+  <div class="search-bar">
+    <input class="search-input" id="tx-search" placeholder="🔍 Search transactions..." oninput="debouncedFilterTx()">
+    <button class="btn btn-sm" onclick="exportCSV()">⬇ CSV</button>
+  </div>
+  <div class="filter-chips" id="tx-filter-chips">
+    <div class="filter-chip active" data-filter="all" onclick="setTxFilter('all',this)">All</div>
+    <div class="filter-chip" data-filter="income" onclick="setTxFilter('income',this)">💰 Income</div>
+    <div class="filter-chip" data-filter="expense" onclick="setTxFilter('expense',this)">💸 Expense</div>
+    <div class="filter-chip" data-filter="transfer" onclick="setTxFilter('transfer',this)">🔄 Transfer</div>
+  </div>
+  <div id="all-txns-list"></div>
+</div>
+</div>
+
+<!-- ════════════════════ TEAMMATES ════════════════════ -->
+<div class="page" id="page-teammates">
+<div class="section" style="padding-top:14px">
+  <div class="info-box" style="background:var(--blue-l);border:0.5px solid #90CAF9">
+    Teammates are your bank accounts, cash wallets, and cards. Each transaction links to a teammate.
+  </div>
+  <div class="teammate-grid" id="teammate-grid"></div>
+  <div class="card">
+    <div class="card-head"><div class="card-icon">➕</div><div class="card-title">Add a teammate</div></div>
+    <div style="margin-bottom:10px">
+      <label class="fl">Pick an icon</label>
+      <div class="tm-icon-grid" id="tm-icon-grid">
+        <div class="tm-icon-opt sel" onclick="pickTmIcon(this,'🏦')">🏦</div>
+        <div class="tm-icon-opt" onclick="pickTmIcon(this,'💳')">💳</div>
+        <div class="tm-icon-opt" onclick="pickTmIcon(this,'💵')">💵</div>
+        <div class="tm-icon-opt" onclick="pickTmIcon(this,'📱')">📱</div>
+        <div class="tm-icon-opt" onclick="pickTmIcon(this,'🪙')">🪙</div>
+        <div class="tm-icon-opt" onclick="pickTmIcon(this,'🏧')">🏧</div>
+        <div class="tm-icon-opt" onclick="pickTmIcon(this,'💼')">💼</div>
+        <div class="tm-icon-opt" onclick="pickTmIcon(this,'🐖')">🐖</div>
+      </div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Account name</label><input class="fi" id="tm-name" placeholder="e.g. SBI Savings, Cash..."></div>
+      <div class="fg" style="max-width:115px"><label class="fl">Type</label>
+        <select class="fs" id="tm-type">
+          <option value="bank">Bank account</option><option value="cash">Cash wallet</option>
+          <option value="credit">Credit card</option><option value="upi">UPI wallet</option>
+          <option value="savings">Savings</option><option value="invest">Investment</option>
+        </select>
+      </div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Current balance (₹)</label><input class="fi" id="tm-balance" type="number" placeholder="0"></div>
+      <div class="fg"><label class="fl">Color</label>
+        <select class="fs" id="tm-color">
+          <option value="#1565C0">Blue</option><option value="#2E7D32">Green</option>
+          <option value="#6A1B9A">Purple</option><option value="#E65100">Orange</option>
+          <option value="#C62828">Red</option><option value="#00695C">Teal</option>
+          <option value="#F57F17">Amber</option><option value="#4527A0">Indigo</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn btn-primary btn-full" onclick="addTeammate()">Add teammate</button>
+  </div>
+</div>
+</div>
+
+<!-- ════════════════════ BOSSES ════════════════════ -->
+<div class="page" id="page-bosses">
+<div class="section" style="padding-top:14px">
+  <div class="info-box" style="background:var(--ruby-l);border:0.5px solid #EF9A9A">
+    Each debt is a <strong style="color:var(--ruby)">Boss</strong>. Every payment chips away at its HP. Defeat them all!
+  </div>
+  <div class="card">
+    <div class="card-head"><div class="card-icon">👾</div><div class="card-title">Summon a new boss (add debt)</div></div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Debt name</label><input class="fi" id="b-name" placeholder="e.g. Car loan, Credit card"></div>
+      <div class="fg" style="max-width:120px"><label class="fl">Type</label>
+        <select class="fs" id="b-type">
+          <option value="homeloan">🏠 Home loan</option><option value="carloan">🚗 Car loan</option>
+          <option value="personal">💼 Personal loan</option><option value="creditcard">💳 Credit card</option>
+          <option value="education">📚 Education</option><option value="other">👹 Other</option>
+        </select>
+      </div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Total amount (₹)</label><input class="fi" id="b-total" type="number" placeholder="500000"></div>
+      <div class="fg"><label class="fl">Already paid (₹)</label><input class="fi" id="b-paid" type="number" placeholder="0"></div>
+      <div class="fg" style="max-width:110px"><label class="fl">Monthly EMI (₹)</label><input class="fi" id="b-emi" type="number" placeholder="5000"></div>
+    </div>
+    <button class="btn btn-danger btn-full" onclick="addBoss()">⚔️ Summon this boss</button>
+  </div>
+  <div id="bosses-list"></div>
+  <div class="stat-grid" style="margin-bottom:12px">
+    <div class="stat-box"><div class="stat-label">Total monthly EMI</div><div class="stat-val" id="boss-emi-total">₹0</div></div>
+    <div class="stat-box"><div class="stat-label">Total remaining</div><div class="stat-val" id="boss-emi-remaining">₹0</div></div>
+  </div>
+</div>
+</div>
+
+<!-- ════════════════════ EMI PAGE (FIX: was missing) ════════════════════ -->
+<div class="page" id="page-emi">
+<div class="section" style="padding-top:14px">
+  <div class="stat-grid stat-grid-4" style="margin-bottom:12px">
+    <div class="stat-box"><div class="stat-label">Total monthly EMI</div><div class="stat-val" id="emi-total">₹0</div></div>
+    <div class="stat-box"><div class="stat-label">EMIs active</div><div class="stat-val" id="emi-count">0</div></div>
+    <div class="stat-box"><div class="stat-label">Total remaining</div><div class="stat-val" id="emi-remaining">₹0</div></div>
+    <div class="stat-box"><div class="stat-label">Paid this month</div><div class="stat-val" id="emi-paid-count">0</div></div>
+  </div>
+  <div class="card">
+    <div class="card-head"><div class="card-icon">📅</div><div class="card-title">EMI schedule</div></div>
+    <div id="emi-schedule"></div>
+  </div>
+  <div class="card">
+    <div class="card-head"><div class="card-icon">✅</div><div class="card-title">Mark paid this month</div></div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:10px">Marking paid attacks the boss and earns XP!</div>
+    <div id="emi-pay-list"></div>
+  </div>
+</div>
+</div>
+
+<!-- ════════════════════ GARDEN ════════════════════ -->
+<div class="page" id="page-garden">
+<div class="section" style="padding-top:14px">
+  <div class="bug-banner" id="bug-banner">
+    <div style="font-size:22px;flex-shrink:0">🐛</div>
+    <div><div class="bug-banner-title" id="bug-title">Bugs attacking!</div><div class="bug-banner-sub" id="bug-sub"></div></div>
+  </div>
+  <div class="garden-scene" id="garden-scene">
+    <div class="plants-row" id="plants-row">
+      <div style="text-align:center;color:#4CAF50;font-size:13px;padding:40px 0;width:100%">No plants yet. Add a savings goal below!</div>
+    </div>
+    <div class="soil-bar"></div>
+  </div>
+  <div class="garden-legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#4CAF50"></div>Healthy</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#FFC107"></div>Dry (7d+)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#FF7043"></div>Wilting (14d+)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#B71C1C"></div>Infested (21d+)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#D4AF37"></div>Achieved!</div>
+  </div>
+  <div class="simulate-row">
+    <span style="font-size:11px;color:var(--text2)">Demo — simulate days without watering:</span>
+    <button class="btn btn-sm" onclick="simGardenDays(0)">Reset</button>
+    <button class="btn btn-sm" onclick="simGardenDays(7)">+7 days</button>
+    <button class="btn btn-sm" onclick="simGardenDays(14)">+14 days</button>
+    <button class="btn btn-sm" onclick="simGardenDays(21)">+21 days</button>
+  </div>
+  <div class="stat-grid">
+    <div class="stat-box"><div class="stat-label">Total saved</div><div class="stat-val" id="g-total-saved">₹0</div></div>
+    <div class="stat-box"><div class="stat-label">Goals completed</div><div class="stat-val" id="g-goals-done">0</div></div>
+    <div class="stat-box"><div class="stat-label">Plants healthy</div><div class="stat-val" id="g-healthy">0</div></div>
+    <div class="stat-box"><div class="stat-label">Need watering</div><div class="stat-val" id="g-need-water" style="color:var(--ruby)">0</div></div>
+  </div>
+  <div class="card" id="plant-list-card" style="display:none">
+    <div class="card-head"><div class="card-icon">🌿</div><div class="card-title">Your plants</div></div>
+    <div id="plant-list"></div>
+  </div>
+  <div class="card">
+    <div class="card-head"><div class="card-icon">🌱</div><div class="card-title">Plant a new goal</div></div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Goal name</label><input class="fi" id="g-name" placeholder="e.g. Goa trip, iPhone..."></div>
+      <div class="fg" style="max-width:120px"><label class="fl">Target (₹)</label><input class="fi" id="g-target" type="number" placeholder="50000"></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Plant type</label>
+        <select class="fs" id="g-type">
+          <option value="flower">🌸 Flower</option><option value="tree">🌳 Tree (big goal)</option>
+          <option value="cactus">🌵 Cactus (emergency)</option><option value="sunflower">🌻 Sunflower</option>
+          <option value="bamboo">🎋 Bamboo (investment)</option><option value="palm">🌴 Palm (vacation)</option>
+        </select>
+      </div>
+      <div class="fg" style="max-width:115px"><label class="fl">Monthly saving (₹)</label><input class="fi" id="g-monthly" type="number" placeholder="5000"></div>
+    </div>
+    <button class="btn btn-green btn-full" onclick="addPlant()">Plant this goal</button>
+  </div>
+</div>
+</div>
+
+<!-- ════════════════════ ACHIEVEMENTS ════════════════════ -->
+<div class="page" id="page-achievements">
+<div class="section" style="padding-top:14px">
+  <div class="card">
+    <div class="card-head"><div class="card-icon">🗺️</div><div class="card-title">Active quests</div></div>
+    <div id="ach-quests-active"></div>
+  </div>
+  <div class="card">
+    <div class="card-head"><div class="card-icon">✅</div><div class="card-title">Completed</div></div>
+    <div id="ach-quests-done"></div>
+  </div>
+  <div class="card">
+    <div class="card-head"><div class="card-icon">🎖️</div><div class="card-title">Achievement badges</div></div>
+    <div style="font-size:11px;color:var(--text2);margin-bottom:12px">Grayed out = not yet earned. Keep going!</div>
+    <div class="badge-grid" id="ach-badge-grid"></div>
+  </div>
+</div>
+</div>
+
+<!-- ════════════════════ REPORTS ════════════════════ -->
+<div class="page" id="page-reports">
+<div class="section" style="padding-top:14px">
+
+  <!-- Budget settings — new feature -->
+  <div class="card">
+    <div class="card-head"><div class="card-icon">🎯</div><div class="card-title">Monthly budgets</div><button class="card-action" onclick="saveBudgets()">Save</button></div>
+    <div style="font-size:11px;color:var(--text2);margin-bottom:10px">Set a monthly spending cap per category. Leave blank for no limit.</div>
+    <div id="budget-settings"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><div class="card-icon">📊</div><div class="card-title">Expense Breakdown</div></div>
+    <div style="position:relative;max-width:300px;margin:0 auto"><canvas id="expense-pie" width="300" height="300"></canvas></div>
+  </div>
+  <div class="card">
+    <div class="card-head"><div class="card-icon">📈</div><div class="card-title">Income vs Expenses</div></div>
+    <canvas id="income-expense-line" width="300" height="200"></canvas>
+  </div>
+  <div class="card">
+    <div class="card-head"><div class="card-icon">🚨</div><div class="card-title">Spending alerts</div></div>
+    <div id="spending-alerts">No alerts at the moment.</div>
+  </div>
+
+  <!-- Recurring transactions settings — new feature -->
+  <div class="card">
+    <div class="card-head"><div class="card-icon">🔄</div><div class="card-title">Recurring transactions</div></div>
+    <div style="font-size:11px;color:var(--text2);margin-bottom:12px">Auto-suggest monthly transactions. Add a new one below.</div>
+    <div id="recurring-list"></div>
+    <div style="margin-top:12px;padding-top:12px;border-top:0.5px solid var(--border)">
+      <div class="fr">
+        <div class="fg"><label class="fl">Title</label><input class="fi" id="rec-title" placeholder="e.g. Netflix, SIP..."></div>
+        <div class="fg" style="max-width:100px"><label class="fl">Amount (₹)</label><input class="fi" id="rec-amount" type="number" placeholder="0"></div>
+      </div>
+      <div class="fr">
+        <div class="fg"><label class="fl">Category</label>
+          <select class="fs" id="rec-cat">
+            <option value="food">🍛 Food</option><option value="transport">🚌 Transport</option>
+            <option value="shopping">🛒 Shopping</option><option value="entertainment">🎬 Entertainment</option>
+            <option value="bills">💡 Bills</option><option value="health">🏥 Health</option>
+            <option value="education">📚 Education</option><option value="investment">📈 Investment</option>
+            <option value="income">💰 Income</option><option value="other">📦 Other</option>
+          </select>
+        </div>
+        <div class="fg" style="max-width:90px"><label class="fl">Type</label>
+          <select class="fs" id="rec-type"><option value="expense">Expense</option><option value="income">Income</option></select>
+        </div>
+        <div class="fg" style="max-width:80px"><label class="fl">Day of month</label>
+          <input class="fi" id="rec-day" type="number" placeholder="1" min="1" max="31">
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="addRecurring()">Add recurring</button>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ════════════════════ SCAN PAGE ════════════════════ -->
+<div class="page" id="page-scan">
+<div class="section" style="padding-top:14px">
+  <div class="card">
+    <div class="card-head"><div class="card-icon">📷</div><div class="card-title">Scan invoice / bill</div></div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:12px">Upload any bill or PDF — Swiggy, Zomato, electricity, Amazon, medical, petrol etc. Claude reads it automatically!</div>
+    <!-- FIX: unique IDs prefixed with page- -->
+    <div class="upload-zone" onclick="document.getElementById('page-file-input').click()">
+      <div style="font-size:36px;margin-bottom:8px">📄</div>
+      <div style="font-size:14px;font-weight:600">Tap to upload bill / invoice</div>
+      <div style="font-size:11px;color:var(--text2);margin-top:4px">JPG, PNG, PDF — all supported</div>
+    </div>
+    <input type="file" id="page-file-input" accept="image/*,application/pdf" style="display:none" onchange="handleScan(event,'page')">
+    <div id="page-scan-error" style="display:none;background:var(--ruby-l);border:0.5px solid #EF9A9A;border-radius:var(--radius-sm);padding:10px 12px;font-size:12px;color:var(--ruby);margin-bottom:10px"></div>
+    <div id="page-scan-loading" style="display:none;text-align:center;padding:24px">
+      <div class="scan-spinner"></div>
+      <div style="font-size:13px;color:var(--text2)">Reading your invoice with Claude AI...</div>
+    </div>
+    <div id="page-scan-result" style="display:none">
+      <div style="font-size:13px;font-weight:600;color:var(--green-d);margin-bottom:12px">✓ Invoice scanned — review and save</div>
+      <div class="fr">
+        <div class="fg"><label class="fl">Merchant / title</label><input class="fi" id="page-s-title" placeholder="Merchant name"></div>
+        <div class="fg" style="max-width:115px"><label class="fl">Amount (₹)</label><input class="fi" id="page-s-amount" type="number"></div>
+      </div>
+      <div class="fr">
+        <div class="fg"><label class="fl">Category</label>
+          <select class="fs" id="page-s-cat">
+            <option value="food">🍛 Food</option><option value="transport">🚌 Transport</option>
+            <option value="shopping">🛒 Shopping</option><option value="entertainment">🎬 Entertainment</option>
+            <option value="bills">💡 Bills</option><option value="health">🏥 Health</option>
+            <option value="education">📚 Education</option><option value="investment">📈 Investment</option>
+            <option value="income">💰 Income</option><option value="other">📦 Other</option>
+          </select>
+        </div>
+        <div class="fg" style="max-width:105px"><label class="fl">Type</label>
+          <select class="fs" id="page-s-type"><option value="expense">Expense</option><option value="income">Income</option></select>
+        </div>
+      </div>
+      <div class="fg" style="margin-bottom:12px"><label class="fl">Account</label><select class="fs" id="page-s-teammate"></select></div>
+      <div id="page-s-notes" style="display:none;font-size:11px;color:var(--text2);padding:9px 11px;background:var(--bg2);border-radius:var(--radius-sm);margin-bottom:12px;line-height:1.5"></div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-primary" style="flex:1" onclick="saveScan('page')">Save + earn XP</button>
+        <button class="btn btn-sm" onclick="cancelScan('page')">Cancel</button>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-head"><div class="card-icon">💡</div><div class="card-title">Works best with</div></div>
+    <div style="font-size:12px;color:var(--text2);line-height:2">
+      📸 Swiggy / Zomato / Blinkit receipts<br>💡 BESCOM / MSEB electricity bills<br>
+      🛒 BigBasket, Amazon, Flipkart invoices<br>🚗 Ola, Uber, petrol pump receipts<br>
+      🏥 Medical bills, pharmacy receipts<br>
+      <span style="color:var(--saffron);font-weight:600">Each scanned invoice = +25 bonus XP!</span>
+    </div>
+  </div>
+</div>
+</div>
+
+</div><!-- end app-wrap -->
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav" id="bottom-nav">
+  <button class="nav-item active" onclick="showPage('dashboard',this)" id="nav-dashboard"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></button>
+  <button class="nav-item" onclick="showPage('transactions',this)" id="nav-transactions"><div class="nav-icon">💸</div><div class="nav-label">Txns</div></button>
+  <button class="nav-item" onclick="showPage('bosses',this)" id="nav-bosses"><div class="nav-icon">⚔️</div><div class="nav-label">Bosses</div></button>
+  <div class="nav-add-wrap">
+    <button class="nav-add" onclick="openTxModal()">＋</button>
+    <div style="font-size:9px;font-weight:500;color:var(--text3);margin-top:4px">Add</div>
+  </div>
+  <button class="nav-item" onclick="showPage('garden',this)" id="nav-garden"><div class="nav-icon">🌱</div><div class="nav-label">Garden</div></button>
+  <button class="nav-item" onclick="showPage('achievements',this)" id="nav-achievements"><div class="nav-icon">🏆</div><div class="nav-label">Achieve</div></button>
+  <button class="nav-item" onclick="showPage('reports',this)" id="nav-reports"><div class="nav-icon">📊</div><div class="nav-label">Reports</div></button>
+  <button class="nav-item" onclick="showPage('teammates',this)" id="nav-teammates"><div class="nav-icon">👥</div><div class="nav-label">Accounts</div></button>
+  <button class="nav-item" onclick="showPage('emi',this)" id="nav-emi"><div class="nav-icon">📅</div><div class="nav-label">EMI</div></button>
+  <button class="nav-item" onclick="showPage('scan',this)" id="nav-scan"><div class="nav-icon">📷</div><div class="nav-label">Scan</div></button>
+</div>
+
+<!-- ════════════════════ MODALS ════════════════════ -->
+
+<!-- ADD / EDIT TRANSACTION -->
+<div class="overlay" id="tx-overlay" onclick="if(event.target===this)closeTxModal()">
+  <div class="sheet">
+    <div class="sheet-header">
+      <div class="sheet-title" id="tx-modal-title">Add transaction</div>
+      <button class="sheet-close" onclick="closeTxModal()">✕</button>
+    </div>
+    <div class="sheet-body">
+      <div style="margin-bottom:12px"><label class="fl">Title</label><input class="fi" id="m-title" placeholder="e.g. Swiggy order, Salary..."></div>
+      <div style="margin-bottom:12px">
+        <label class="fl">Amount type</label>
+        <div class="type-toggle">
+          <!-- FIX: all three have explicit reset logic in setTxType() -->
+          <button class="type-btn t-exp" id="m-exp" onclick="setTxType('expense')">🔴 Expense</button>
+          <button class="type-btn" id="m-inc" onclick="setTxType('income')">🟢 Income</button>
+          <button class="type-btn" id="m-tr" onclick="setTxType('transfer')">🔵 Transfer</button>
+        </div>
+      </div>
+      <div id="expense-sub" style="display:block;margin-bottom:12px">
+        <label class="fl">How to add expense?</label>
+        <div class="type-toggle">
+          <button class="type-btn t-exp" id="exp-manual" onclick="setExpenseMode('manual')">📝 Manual</button>
+          <button class="type-btn" id="exp-scan" onclick="setExpenseMode('scan')">📷 Scan</button>
+        </div>
+      </div>
+      <!-- Manual form -->
+      <div id="tx-form">
+        <div class="fr">
+          <div class="fg"><label class="fl">Amount (₹)</label><input class="fi" id="m-amount" type="number" placeholder="0" min="0"></div>
+          <div class="fg"><label class="fl">Date</label><input class="fi" id="m-date" type="date"></div>
+        </div>
+        <div style="margin-bottom:12px"><label class="fl">Account (from)</label><select class="fs" id="m-teammate"></select></div>
+        <div id="m-tm-to-wrap" style="display:none;margin-bottom:12px"><label class="fl">Transfer to</label><select class="fs" id="m-teammate-to"></select></div>
+        <div style="margin-bottom:12px"><label class="fl">Category</label>
+          <select class="fs" id="m-cat">
+            <option value="food">🍛 Food & dining</option><option value="transport">🚌 Transport</option>
+            <option value="shopping">🛒 Shopping</option><option value="entertainment">🎬 Entertainment</option>
+            <option value="bills">💡 Bills & utilities</option><option value="health">🏥 Health</option>
+            <option value="education">📚 Education</option><option value="investment">📈 Investment</option>
+            <option value="income">💰 Income / salary</option><option value="other">📦 Other</option>
+          </select>
+        </div>
+        <!-- Recurring option -->
+        <div style="margin-bottom:14px;display:flex;align-items:center;gap:8px">
+          <input type="checkbox" id="m-recurring" style="width:16px;height:16px">
+          <label for="m-recurring" style="font-size:12px;color:var(--text2)">🔄 Mark as recurring (monthly)</label>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-primary" style="flex:1" id="m-save-btn" onclick="saveTx()">Add transaction</button>
+          <button class="btn btn-danger btn-sm" id="m-del-btn" style="display:none" onclick="deleteTx()">Delete</button>
+        </div>
+      </div>
+      <!-- Scan sub-form in modal — FIX: unique IDs prefixed with modal- -->
+      <div id="scan-form" style="display:none">
+        <div class="upload-zone" onclick="document.getElementById('modal-file-input').click()">
+          <div style="font-size:36px;margin-bottom:8px">📄</div>
+          <div style="font-size:14px;font-weight:600">Tap to upload bill / invoice</div>
+          <div style="font-size:11px;color:var(--text2);margin-top:4px">JPG, PNG, PDF — all supported</div>
+        </div>
+        <input type="file" id="modal-file-input" accept="image/*,application/pdf" style="display:none" onchange="handleScan(event,'modal')">
+        <div id="modal-scan-error" style="display:none;background:var(--ruby-l);border:0.5px solid #EF9A9A;border-radius:var(--radius-sm);padding:10px 12px;font-size:12px;color:var(--ruby);margin-bottom:10px"></div>
+        <div id="modal-scan-loading" style="display:none;text-align:center;padding:24px">
+          <div class="scan-spinner"></div>
+          <div style="font-size:13px;color:var(--text2)">Reading your invoice with Claude AI...</div>
+        </div>
+        <div id="modal-scan-result" style="display:none">
+          <div style="font-size:13px;font-weight:600;color:var(--green-d);margin-bottom:12px">✓ Invoice scanned — review and save</div>
+          <div class="fr">
+            <div class="fg"><label class="fl">Merchant / title</label><input class="fi" id="modal-s-title"></div>
+            <div class="fg" style="max-width:115px"><label class="fl">Amount (₹)</label><input class="fi" id="modal-s-amount" type="number"></div>
+          </div>
+          <div class="fr">
+            <div class="fg"><label class="fl">Category</label>
+              <select class="fs" id="modal-s-cat">
+                <option value="food">🍛 Food</option><option value="transport">🚌 Transport</option>
+                <option value="shopping">🛒 Shopping</option><option value="entertainment">🎬 Entertainment</option>
+                <option value="bills">💡 Bills</option><option value="health">🏥 Health</option>
+                <option value="education">📚 Education</option><option value="investment">📈 Investment</option>
+                <option value="income">💰 Income</option><option value="other">📦 Other</option>
+              </select>
+            </div>
+            <div class="fg" style="max-width:105px"><label class="fl">Type</label>
+              <select class="fs" id="modal-s-type"><option value="expense">Expense</option><option value="income">Income</option></select>
+            </div>
+          </div>
+          <div class="fg" style="margin-bottom:12px"><label class="fl">Account</label><select class="fs" id="modal-s-teammate"></select></div>
+          <div id="modal-s-notes" style="display:none;font-size:11px;color:var(--text2);padding:9px 11px;background:var(--bg2);border-radius:var(--radius-sm);margin-bottom:12px;line-height:1.5"></div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-primary" style="flex:1" onclick="saveScan('modal')">Save + earn XP</button>
+            <button class="btn btn-sm" onclick="cancelScan('modal')">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BOSS ATTACK — FIX: added account selector -->
+<div class="overlay" id="boss-overlay" onclick="if(event.target===this)closeBossModal()">
+  <div class="sheet">
+    <div class="sheet-header">
+      <div class="sheet-title" id="boss-modal-title">Attack boss</div>
+      <button class="sheet-close" onclick="closeBossModal()">✕</button>
+    </div>
+    <div class="sheet-body">
+      <div style="font-size:12px;color:var(--text2);margin-bottom:12px" id="boss-modal-sub"></div>
+      <div style="margin-bottom:12px"><label class="fl">Payment amount (₹)</label><input class="fi" id="boss-pay-amt" type="number" placeholder="Enter payment amount"></div>
+      <div style="margin-bottom:14px"><label class="fl">Pay from account</label><select class="fs" id="boss-pay-tm"></select></div>
+      <button class="btn btn-primary btn-full" onclick="confirmBossAttack()">⚔️ Attack! Deal damage</button>
+    </div>
+  </div>
+</div>
+
+<!-- WATER PLANT -->
+<div class="overlay" id="water-overlay" onclick="if(event.target===this)closeWaterModal()">
+  <div class="sheet">
+    <div class="sheet-header">
+      <div class="sheet-title" id="water-modal-title">Water plant</div>
+      <button class="sheet-close" onclick="closeWaterModal()">✕</button>
+    </div>
+    <div class="sheet-body">
+      <div style="text-align:center;font-size:52px;margin-bottom:8px" id="water-plant-svg"></div>
+      <div style="font-size:12px;color:var(--text2);text-align:center;margin-bottom:14px" id="water-modal-sub"></div>
+      <div style="height:8px;background:var(--bg3);border-radius:4px;margin-bottom:14px;overflow:hidden"><div id="water-progress-bar" style="height:100%;background:var(--green);border-radius:4px;transition:width .4s"></div></div>
+      <div class="fr" style="justify-content:space-between;font-size:11px;color:var(--text2);margin-bottom:14px">
+        <span id="water-saved-label">Saved: ₹0</span><span id="water-target-label">Goal: ₹0</span>
+      </div>
+      <div style="margin-bottom:14px"><label class="fl">Amount to add (₹)</label><input class="fi" id="water-amt" type="number" placeholder="0"></div>
+      <button class="btn btn-green btn-full" onclick="confirmWater()">💧 Water this plant!</button>
+    </div>
+  </div>
+</div>
+
+<!-- TEAMMATE DETAIL -->
+<div class="overlay" id="tm-overlay" onclick="if(event.target===this)closeTmModal()">
+  <div class="sheet">
+    <div class="sheet-header">
+      <div class="sheet-title" id="tm-modal-title">Account</div>
+      <button class="sheet-close" onclick="closeTmModal()">✕</button>
+    </div>
+    <div class="sheet-body" id="tm-modal-body"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ── DATA CONSTANTS ───────────────────────────────────── */
+const LEVELS=[
+  {name:'Shishya',min:0,max:500},{name:'Vyapari',min:500,max:1200},
+  {name:'Sanchayak',min:1200,max:2500},{name:'Arthik',min:2500,max:5000},
+  {name:'Dhanvaan',min:5000,max:10000},{name:'Kuber',min:10000,max:Infinity}
+];
+const CATS={
+  food:{icon:'🍛',color:'#FF6B00',bg:'#FFF3E8'},
+  transport:{icon:'🚌',color:'#0050A0',bg:'#E8F0FB'},
+  shopping:{icon:'🛒',color:'#8E24AA',bg:'#F3E5F5'},
+  entertainment:{icon:'🎬',color:'#E53935',bg:'#FFEBEE'},
+  bills:{icon:'💡',color:'#F9A825',bg:'#FFFDE7'},
+  health:{icon:'🏥',color:'#00897B',bg:'#E0F2F1'},
+  education:{icon:'📚',color:'#1565C0',bg:'#E3F2FD'},
+  investment:{icon:'📈',color:'#2E7D32',bg:'#E8F5E9'},
+  income:{icon:'💰',color:'#138808',bg:'#E8F5E9'},
+  other:{icon:'📦',color:'#546E7A',bg:'#ECEFF1'}
+};
+const BOSS_TYPES={
+  homeloan:{icon:'🏠',color:'#7B1FA2',bg:'#F3E5F5'},
+  carloan:{icon:'🚗',color:'#1565C0',bg:'#E3F2FD'},
+  personal:{icon:'💼',color:'#E65100',bg:'#FFF3E8'},
+  creditcard:{icon:'💳',color:'#C62828',bg:'#FFEBEE'},
+  education:{icon:'📚',color:'#2E7D32',bg:'#E8F5E9'},
+  other:{icon:'👹',color:'#4E342E',bg:'#EFEBE9'}
+};
+const TM_TYPES={bank:'Bank account',cash:'Cash wallet',credit:'Credit card',upi:'UPI wallet',savings:'Savings',invest:'Investment'};
+const BADGES_DEF=[
+  {id:'first_tx',icon:'🌱',name:'First step',desc:'Log first transaction'},
+  {id:'scan_1',icon:'📷',name:'Scanner',desc:'Scan first invoice'},
+  {id:'boss_added',icon:'👾',name:'Boss summoned',desc:'Add first debt'},
+  {id:'boss_defeated',icon:'⚔️',name:'Debt slayer',desc:'Defeat a boss'},
+  {id:'all_bosses',icon:'👑',name:'Debt free!',desc:'All bosses defeated'},
+  {id:'plant_1',icon:'🌿',name:'Green thumb',desc:'Plant a savings goal'},
+  {id:'plant_full',icon:'🌳',name:'Garden master',desc:'Reach a savings goal'},
+  {id:'first_tm',icon:'🏦',name:'First account',desc:'Add a teammate'},
+  {id:'team_3',icon:'👥',name:'Full team',desc:'Add 3 teammates'},
+  {id:'streak_7',icon:'🔥',name:'Week warrior',desc:'7-day streak'},
+  {id:'streak_30',icon:'⚡',name:'Month master',desc:'30-day streak'},
+  {id:'save_10k',icon:'💎',name:'Lakhpati jr.',desc:'Save ₹10,000 net'},
+  {id:'invest_1',icon:'📈',name:'Niveshak',desc:'Log an investment'},
+  {id:'transfer_1',icon:'🔄',name:'Mover',desc:'Make a transfer'},
+  {id:'edited_tx',icon:'✏️',name:'Corrector',desc:'Edit a transaction'},
+  {id:'quests_3',icon:'🗡️',name:'Quest hero',desc:'Complete 3 quests'},
+];
+const QUESTS_DEF=[
+  {id:'q1',icon:'📝',name:'Track ₹5,000 in expenses',xp:100,type:'spend_total',target:5000},
+  {id:'q2',icon:'🔥',name:'Log 7 days in a row',xp:150,type:'streak',target:7},
+  {id:'q3',icon:'📷',name:'Scan 3 invoices',xp:80,type:'scan_count',target:3},
+  {id:'q4',icon:'🍛',name:'Keep food spend under ₹3,000',xp:120,type:'cat_limit',cat:'food',limit:3000},
+  {id:'q5',icon:'👾',name:'Defeat your first boss',xp:200,type:'boss_defeated'},
+  {id:'q6',icon:'🌱',name:'Plant 3 savings goals',xp:100,type:'plants',target:3},
+  {id:'q7',icon:'👥',name:'Add 2 teammates',xp:60,type:'teammates',target:2},
+];
+
+/* ── STATE ────────────────────────────────────────────── */
+let S={
+  xp:0, transactions:[], teammates:[], bosses:[], plants:[],
+  earnedBadges:[], completedQuests:[],
+  streak:0, streakDays:[],
+  scanCount:0, simOffset:0,
+  currentTxType:'expense', expenseMode:'manual',
+  editingTxId:null, attackingBossId:null, wateringPlantId:null,
+  selectedTmIcon:'🏦',
+  budgets:{}, recurringTx:[], hasOnboarded:false,
+  txFilter:'all', recurringDismissedDate:null,
+};
+
+/* ── CHART REGISTRY (FIX: prevent memory leak) ─────────── */
+const _charts={};
+function destroyChart(key){_charts[key]?.destroy();delete _charts[key];}
+function createChart(key,ctx,config){destroyChart(key);_charts[key]=new Chart(ctx,config);return _charts[key];}
+
+/* ── PERSIST / HYDRATE ─────────────────────────────────── */
+let _persistTimer=null;
+function persist(){clearTimeout(_persistTimer);_persistTimer=setTimeout(()=>{try{localStorage.setItem('aq_v2',JSON.stringify(S));}catch(e){}},500);}
+function hydrate(){try{const d=localStorage.getItem('aq_v2');if(d)S=Object.assign({},S,JSON.parse(d));}catch(e){}}
+
+/* ── UTILS ─────────────────────────────────────────────── */
+const fmt=n=>'₹'+Math.round(n).toLocaleString('en-IN');
+// FIX: locale-safe date string using ISO
+function todayStr(){return new Date().toISOString().split('T')[0];}
+function nowISO(){return new Date().toISOString();}
+function fmtDate(iso){return new Date(iso).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});}
+function daysSince(iso){if(!iso)return 999;const now=new Date();now.setDate(now.getDate()+S.simOffset);return Math.floor((now-new Date(iso))/(864e5));}
+function getLevel(xp){for(let i=LEVELS.length-1;i>=0;i--)if(xp>=LEVELS[i].min)return{level:i+1,...LEVELS[i]};return{level:1,...LEVELS[0]};}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2800);}
+
+/* ── ONBOARDING (FIX: prevents forced seed data) ────────── */
+function onboard(loadDemo){
+  if(loadDemo)seedDemoData();
+  S.hasOnboarded=true;persist();
+  document.getElementById('onboard-overlay').style.display='none';
+  renderPage(currentPage);
+}
+
+/* ── XP & LEVEL ─────────────────────────────────────────── */
+function addXP(n,reason){
+  S.xp+=n;updateXPDisplay();
+  toast('+'+n+' XP — '+reason+'!');
+  checkBadges();checkQuests();persist();
+}
+function updateXPDisplay(){
+  const lv=getLevel(S.xp);
+  document.getElementById('hdr-xp').textContent=S.xp.toLocaleString('en-IN');
+  document.getElementById('hdr-level').textContent='Level '+lv.level+' · '+lv.name;
+  const pct=lv.max===Infinity?100:Math.min(100,Math.round(((S.xp-lv.min)/(lv.max-lv.min))*100));
+  document.getElementById('xp-fill').style.width=pct+'%';
+  document.getElementById('xp-bar-label').textContent=S.xp.toLocaleString('en-IN')+' / '+(lv.max===Infinity?'MAX':lv.max.toLocaleString('en-IN'))+' XP';
+}
+
+/* ── NAVIGATION ─────────────────────────────────────────── */
+let currentPage='dashboard';
+function showPage(page,navEl){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+  const el=document.getElementById('page-'+page);
+  if(el)el.classList.add('active');
+  if(navEl)navEl.classList.add('active');
+  else{const nb=document.getElementById('nav-'+page);if(nb)nb.classList.add('active');}
+  currentPage=page;
+  renderPage(page);
+  window.scrollTo(0,0);
+}
+function renderPage(page){
+  if(page==='dashboard')renderDashboard();
+  else if(page==='transactions')renderTxPage();
+  else if(page==='teammates')renderTeammates();
+  else if(page==='bosses')renderBosses();
+  else if(page==='emi')renderEMI();
+  else if(page==='garden')renderGarden();
+  else if(page==='achievements')renderAchievements();
+  else if(page==='reports')renderReports();
+  updateXPDisplay();
+}
+
+/* ── TEAMMATES ──────────────────────────────────────────── */
+function pickTmIcon(el,icon){
+  document.querySelectorAll('.tm-icon-opt').forEach(e=>e.classList.remove('sel'));
+  el.classList.add('sel');S.selectedTmIcon=icon;
+}
+function addTeammate(){
+  const name=document.getElementById('tm-name').value.trim();
+  const type=document.getElementById('tm-type').value;
+  const bal=parseFloat(document.getElementById('tm-balance').value)||0;
+  const color=document.getElementById('tm-color').value;
+  const icon=S.selectedTmIcon||'🏦';
+  if(!name){toast('Enter account name');return;}
+  S.teammates.push({id:Date.now(),name,type,balance:bal,initialBalance:bal,color,icon});
+  document.getElementById('tm-name').value='';document.getElementById('tm-balance').value='';
+  addXP(25,'New teammate added!');renderTeammates();persist();
+}
+function deleteTeammate(id){
+  if(!confirm('Remove this teammate?'))return;
+  S.teammates=S.teammates.filter(t=>t.id!==id);
+  renderTeammates();renderDashboard();persist();toast('Teammate removed');
+}
+function getTmBalance(tm){
+  let bal=tm.initialBalance||0;
+  S.transactions.forEach(tx=>{
+    if(tx.type==='expense'&&tx.teammateId===tm.id)bal-=tx.amount;
+    else if(tx.type==='income'&&tx.teammateId===tm.id)bal+=tx.amount;
+    else if(tx.type==='transfer'){
+      if(tx.teammateId===tm.id)bal-=tx.amount;
+      if(tx.teammateToId===tm.id)bal+=tx.amount;
+    }
+  });
+  return bal;
+}
+function renderTeammates(){
+  const grid=document.getElementById('teammate-grid');
+  if(!grid)return;
+  if(!S.teammates.length){grid.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="empty-icon">🏦</div><div class="empty-text">No teammates yet. Add a bank account or cash wallet below!</div></div>';return;}
+  grid.innerHTML=S.teammates.map(tm=>{
+    const bal=getTmBalance(tm);
+    const cnt=S.transactions.filter(t=>t.teammateId===tm.id||t.teammateToId===tm.id).length;
+    return`<div class="tm-card" onclick="openTmDetail(${tm.id})">
+      <button class="tm-del-btn" onclick="event.stopPropagation();deleteTeammate(${tm.id})">✕</button>
+      <div class="tm-avatar" style="background:${tm.color}22">${tm.icon}</div>
+      <div class="tm-name">${tm.name}</div>
+      <div class="tm-type" style="color:${tm.color}">${TM_TYPES[tm.type]||tm.type}</div>
+      <div class="tm-balance" style="color:${bal>=0?'var(--green-d)':'var(--ruby)'}">${fmt(bal)}</div>
+      <div class="tm-tx-count">${cnt} transactions</div>
+    </div>`;
+  }).join('');
+}
+function openTmDetail(id){
+  const tm=S.teammates.find(t=>t.id===id);if(!tm)return;
+  const bal=getTmBalance(tm);
+  const tmTx=S.transactions.filter(t=>t.teammateId===id||t.teammateToId===id).slice(0,8);
+  document.getElementById('tm-modal-title').textContent=tm.icon+' '+tm.name;
+  document.getElementById('tm-modal-body').innerHTML=`
+    <div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg2);border-radius:var(--radius-sm);margin-bottom:14px">
+      <div style="width:46px;height:46px;border-radius:12px;background:${tm.color}22;display:flex;align-items:center;justify-content:center;font-size:22px">${tm.icon}</div>
+      <div style="flex:1"><div style="font-size:15px;font-weight:700;font-family:var(--fh)">${tm.name}</div><div style="font-size:11px;color:var(--text2)">${TM_TYPES[tm.type]||tm.type}</div></div>
+      <div style="text-align:right"><div style="font-family:var(--fh);font-size:20px;font-weight:800;color:${bal>=0?'var(--green-d)':'var(--ruby)'}">${fmt(bal)}</div><div style="font-size:10px;color:var(--text2)">current balance</div></div>
+    </div>
+    <div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Recent activity</div>
+    ${tmTx.length?tmTx.map(tx=>{const c=CATS[tx.cat]||CATS.other;const isOut=(tx.type==='expense')||(tx.type==='transfer'&&tx.teammateId===id);return`<div style="display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:0.5px solid var(--border)"><div style="width:30px;height:30px;border-radius:7px;background:${c.bg};display:flex;align-items:center;justify-content:center;font-size:13px">${c.icon}</div><div style="flex:1"><div style="font-size:12px;font-weight:500">${tx.title}</div><div style="font-size:10px;color:var(--text2)">${fmtDate(tx.date)}</div></div><div style="font-size:13px;font-weight:700;color:${isOut?'var(--ruby)':'var(--green-d)'}">${isOut?'-':'+'}${fmt(tx.amount)}</div></div>`;}).join(''):'<div class="empty" style="padding:12px 0"><div class="empty-text">No transactions yet</div></div>'}
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button class="btn btn-primary" style="flex:1" onclick="closeTmModal();openTxModal(${id})">+ Add transaction</button>
+      <button class="btn btn-danger btn-sm" onclick="closeTmModal();deleteTeammate(${id})">Remove</button>
+    </div>`;
+  document.getElementById('tm-overlay').classList.add('open');
+}
+function closeTmModal(){document.getElementById('tm-overlay').classList.remove('open');}
+
+/* ── TRANSACTIONS ────────────────────────────────────────── */
+function populateTmSelects(selId,selToId){
+  const opts=S.teammates.length?S.teammates.map(tm=>`<option value="${tm.id}">${tm.icon} ${tm.name}</option>`).join(''):'<option value="">No accounts</option>';
+  ['m-teammate','m-teammate-to','modal-s-teammate','page-s-teammate','boss-pay-tm'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.innerHTML=opts;
+  });
+  if(selId){const el=document.getElementById('m-teammate');if(el)el.value=selId;}
+  if(selToId){const el=document.getElementById('m-teammate-to');if(el)el.value=selToId;}
+}
+
+function openTxModal(preselTm){
+  S.editingTxId=null;
+  document.getElementById('tx-modal-title').textContent='Add transaction';
+  document.getElementById('m-save-btn').textContent='Add transaction';
+  document.getElementById('m-del-btn').style.display='none';
+  document.getElementById('m-title').value='';
+  document.getElementById('m-amount').value='';
+  document.getElementById('m-date').value=new Date().toISOString().split('T')[0];
+  document.getElementById('m-cat').value='food';
+  document.getElementById('m-recurring').checked=false;
+  // FIX: reset type toggle fully before setting
+  setTxType('expense');
+  S.expenseMode='manual';
+  setExpenseMode('manual');
+  populateTmSelects(preselTm||null);
+  document.getElementById('tx-overlay').classList.add('open');
+  setTimeout(()=>document.getElementById('m-title').focus(),280);
+}
+function openEditTxModal(id){
+  const tx=S.transactions.find(t=>t.id===id);if(!tx)return;
+  S.editingTxId=id;
+  document.getElementById('tx-modal-title').textContent='Edit transaction';
+  document.getElementById('m-save-btn').textContent='Save changes';
+  document.getElementById('m-del-btn').style.display='block';
+  document.getElementById('m-title').value=tx.title||'';
+  document.getElementById('m-amount').value=tx.amount||'';
+  document.getElementById('m-date').value=tx.date?tx.date.split('T')[0]:new Date().toISOString().split('T')[0];
+  document.getElementById('m-cat').value=tx.cat||'food';
+  document.getElementById('m-recurring').checked=!!tx.recurring;
+  setTxType(tx.type||'expense');
+  setExpenseMode('manual');
+  populateTmSelects(tx.teammateId,tx.teammateToId);
+  document.getElementById('tx-overlay').classList.add('open');
+}
+function closeTxModal(){document.getElementById('tx-overlay').classList.remove('open');S.editingTxId=null;}
+
+// FIX: properly reset all buttons before setting active state
+function setTxType(t){
+  S.currentTxType=t;
+  // Reset ALL three buttons first
+  document.getElementById('m-exp').className='type-btn';
+  document.getElementById('m-inc').className='type-btn';
+  document.getElementById('m-tr').className='type-btn';
+  // Apply active class to selected
+  const classMap={expense:'t-exp',income:'t-inc',transfer:'t-tr'};
+  const idMap={expense:'m-exp',income:'m-inc',transfer:'m-tr'};
+  document.getElementById(idMap[t]).className='type-btn '+classMap[t];
+  document.getElementById('m-tm-to-wrap').style.display=t==='transfer'?'block':'none';
+  document.getElementById('expense-sub').style.display=t==='expense'?'block':'none';
+  if(t!=='expense'){document.getElementById('tx-form').style.display='block';document.getElementById('scan-form').style.display='none';}
+  const labels={expense:'Add expense',income:'Add income',transfer:'Add transfer'};
+  if(!S.editingTxId)document.getElementById('m-save-btn').textContent=labels[t];
+  if(t==='income')document.getElementById('m-cat').value='income';
+  else if(t!=='transfer'&&document.getElementById('m-cat').value==='income')document.getElementById('m-cat').value='food';
+}
+function setExpenseMode(mode){
+  S.expenseMode=mode;
+  document.getElementById('exp-manual').className=mode==='manual'?'type-btn t-exp':'type-btn';
+  document.getElementById('exp-scan').className=mode==='scan'?'type-btn t-exp':'type-btn';
+  document.getElementById('tx-form').style.display=mode==='manual'?'block':'none';
+  document.getElementById('scan-form').style.display=mode==='scan'?'block':'none';
+}
+function saveTx(){
+  const title=document.getElementById('m-title').value.trim();
+  const amount=parseFloat(document.getElementById('m-amount').value)||0;
+  const type=S.currentTxType;
+  const cat=document.getElementById('m-cat').value;
+  const date=document.getElementById('m-date').value;
+  const recurring=document.getElementById('m-recurring').checked;
+  const teammateId=parseInt(document.getElementById('m-teammate').value)||null;
+  const teammateToId=(type==='transfer'&&document.getElementById('m-teammate-to').value)?parseInt(document.getElementById('m-teammate-to').value):null;
+  if(!title){toast('Enter a title');return;}
+  if(amount<=0){toast('Enter a valid amount');return;}
+  if(type==='transfer'&&teammateId===teammateToId){toast('Transfer must be between different accounts');return;}
+  if(S.editingTxId){
+    const idx=S.transactions.findIndex(t=>t.id===S.editingTxId);
+    if(idx>=0)S.transactions[idx]={...S.transactions[idx],title,amount,type,cat,date:date+'T00:00:00.000Z',teammateId,teammateToId,recurring};
+    addXP(5,'Transaction edited');
+    if(!S.earnedBadges.includes('edited_tx')){S.earnedBadges.push('edited_tx');}
+  } else {
+    const td=todayStr();
+    if(!S.streakDays.includes(td)){S.streakDays.push(td);S.streak++;}
+    S.transactions.unshift({id:Date.now(),title,amount,type,cat,date:date+'T00:00:00.000Z',teammateId,teammateToId,fromScan:false,recurring});
+    // Auto-add to recurring list if checked
+    if(recurring&&!S.recurringTx.find(r=>r.title===title)){
+      S.recurringTx.push({id:Date.now()+1,title,amount,type,cat,teammateId,day:new Date().getDate()});
+    }
+    addXP(type==='income'?20:type==='transfer'?5:10,type==='income'?'Income logged':type==='transfer'?'Transfer recorded':'Expense logged');
+  }
+  checkBudgets();
+  closeTxModal();renderPage(currentPage);persist();
+}
+function deleteTx(){
+  if(!S.editingTxId||!confirm('Delete this transaction?'))return;
+  S.transactions=S.transactions.filter(t=>t.id!==S.editingTxId);
+  closeTxModal();toast('Transaction deleted');renderPage(currentPage);persist();
+}
+
+/* ── SEARCH & FILTER (new feature) ──────────────────────── */
+let _txFilterType='all';
+let _txSearchQuery='';
+let _searchDebounce=null;
+function setTxFilter(type,el){
+  _txFilterType=type;
+  document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  renderTxList('all-txns-list',null);
+}
+function debouncedFilterTx(){
+  clearTimeout(_searchDebounce);
+  _searchDebounce=setTimeout(()=>{
+    _txSearchQuery=document.getElementById('tx-search')?.value.toLowerCase()||'';
+    renderTxList('all-txns-list',null);
+  },300);
+}
+function getFilteredTx(){
+  return S.transactions.filter(tx=>{
+    const matchType=_txFilterType==='all'||tx.type===_txFilterType;
+    const matchSearch=!_txSearchQuery||tx.title.toLowerCase().includes(_txSearchQuery);
+    return matchType&&matchSearch;
+  });
+}
+
+function renderTxPage(){
+  renderTxList('all-txns-list',null);
+}
+
+function renderTxList(containerId,limit){
+  const el=document.getElementById(containerId);if(!el)return;
+  const list=containerId==='all-txns-list'?getFilteredTx():S.transactions.slice(0,limit||6);
+  if(!list.length){el.innerHTML='<div class="empty"><div class="empty-icon">💸</div><div class="empty-text">No transactions found.</div></div>';return;}
+  el.innerHTML=list.map(tx=>{
+    const c=CATS[tx.cat]||CATS.other;
+    const tm=S.teammates.find(t=>t.id===tx.teammateId);
+    // FIX: transfer shows directional color
+    const sign=tx.type==='income'?'+':tx.type==='transfer'?'⇄':'-';
+    const amtColor=tx.type==='income'?'var(--green-d)':tx.type==='transfer'?'var(--blue)':'var(--ruby)';
+    const tmChip=tm?`<span class="tm-chip" style="background:${tm.color}18;color:${tm.color};border:0.5px solid ${tm.color}44">${tm.icon} ${tm.name}</span>`:'';
+    const recChip=tx.recurring?`<span class="tm-chip" style="background:#E3F2FD;color:#1565C0;border:0.5px solid #90CAF9">🔄 recurring</span>`:'';
+    return`<div class="tx-item" onclick="openEditTxModal(${tx.id})">
+      <div class="tx-color-bar" style="background:${tm?.color||c.color}"></div>
+      <div class="tx-icon-wrap" style="background:${c.bg}">${c.icon}</div>
+      <div class="tx-content">
+        <div class="tx-title">${tx.title}</div>
+        <div class="tx-meta">${fmtDate(tx.date)} ${tmChip}${recChip}</div>
+      </div>
+      <div class="tx-right">
+        <div class="tx-amount" style="color:${amtColor}">${sign}${fmt(tx.amount)}</div>
+        <div class="tx-hint">tap to edit</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ── CSV EXPORT (new feature) ─────────────────────────── */
+function exportCSV(){
+  if(!S.transactions.length){toast('No transactions to export');return;}
+  const headers=['Date','Title','Type','Category','Amount','Account'];
+  const rows=S.transactions.map(tx=>{
+    const tm=S.teammates.find(t=>t.id===tx.teammateId);
+    return[
+      tx.date.split('T')[0],
+      '"'+tx.title.replace(/"/g,'""')+'"',
+      tx.type,tx.cat,tx.amount,
+      tm?'"'+tm.name+'"':''
+    ].join(',');
+  });
+  const csv=[headers.join(','),...rows].join('\n');
+  const blob=new Blob([csv],{type:'text/csv'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download='arthquest_transactions.csv';
+  document.body.appendChild(a);a.click();
+  document.body.removeChild(a);URL.revokeObjectURL(url);
+  toast('CSV exported!');
+}
+
+/* ── BUDGETS (new feature) ────────────────────────────── */
+function renderBudgetSettings(){
+  const el=document.getElementById('budget-settings');if(!el)return;
+  const cats=['food','transport','shopping','entertainment','bills','health','education'];
+  el.innerHTML=cats.map(c=>{
+    const cat=CATS[c];
+    return`<div class="fr" style="align-items:center">
+      <div style="font-size:16px;width:24px">${cat.icon}</div>
+      <div class="fg"><label class="fl" style="margin:0">${c}</label></div>
+      <div style="max-width:120px"><input class="fi" id="budget-${c}" type="number" placeholder="No limit" value="${S.budgets[c]||''}"></div>
+    </div>`;
+  }).join('');
+}
+function saveBudgets(){
+  ['food','transport','shopping','entertainment','bills','health','education'].forEach(c=>{
+    const val=parseFloat(document.getElementById('budget-'+c)?.value)||0;
+    if(val>0)S.budgets[c]=val;else delete S.budgets[c];
+  });
+  persist();toast('Budgets saved!');renderDashboard();
+}
+function checkBudgets(){
+  const now=new Date();
+  Object.entries(S.budgets).forEach(([cat,limit])=>{
+    const spent=S.transactions.filter(t=>t.type==='expense'&&t.cat===cat&&new Date(t.date).getMonth()===now.getMonth()&&new Date(t.date).getFullYear()===now.getFullYear()).reduce((s,t)=>s+t.amount,0);
+    if(spent>limit)toast(`⚠️ Over ${cat} budget! Spent ${fmt(spent)} of ${fmt(limit)}`);
+    else if(spent>limit*0.8)toast(`⚠️ 80%+ of ${cat} budget used (${fmt(spent)} / ${fmt(limit)})`);
+  });
+}
+
+/* ── RECURRING TRANSACTIONS (new feature) ─────────────── */
+function addRecurring(){
+  const title=document.getElementById('rec-title').value.trim();
+  const amount=parseFloat(document.getElementById('rec-amount').value)||0;
+  const cat=document.getElementById('rec-cat').value;
+  const type=document.getElementById('rec-type').value;
+  const day=parseInt(document.getElementById('rec-day').value)||1;
+  if(!title||amount<=0){toast('Enter title and amount');return;}
+  S.recurringTx.push({id:Date.now(),title,amount,cat,type,day,teammateId:S.teammates[0]?.id||null});
+  document.getElementById('rec-title').value='';document.getElementById('rec-amount').value='';
+  renderRecurringList();persist();toast('Recurring added!');
+}
+function deleteRecurring(id){
+  S.recurringTx=S.recurringTx.filter(r=>r.id!==id);
+  renderRecurringList();persist();
+}
+function renderRecurringList(){
+  const el=document.getElementById('recurring-list');if(!el)return;
+  if(!S.recurringTx.length){el.innerHTML='<div style="font-size:12px;color:var(--text2)">No recurring transactions yet.</div>';return;}
+  el.innerHTML=S.recurringTx.map(r=>{
+    const c=CATS[r.cat]||CATS.other;
+    return`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:0.5px solid var(--border)">
+      <div style="width:32px;height:32px;border-radius:8px;background:${c.bg};display:flex;align-items:center;justify-content:center;font-size:14px">${c.icon}</div>
+      <div style="flex:1"><div style="font-size:13px;font-weight:600">${r.title}</div><div style="font-size:10px;color:var(--text2)">${fmt(r.amount)} · ${r.type} · day ${r.day} of month</div></div>
+      <button class="btn btn-sm btn-danger" onclick="deleteRecurring(${r.id})">✕</button>
+    </div>`;
+  }).join('');
+}
+function checkRecurring(){
+  if(!S.recurringTx.length)return;
+  const today=new Date();
+  const todayISO=todayStr();
+  if(S.recurringDismissedDate===todayISO)return;
+  const due=S.recurringTx.filter(r=>{
+    const due=today.getDate()>=r.day;
+    const alreadyLogged=S.transactions.some(t=>t.title===r.title&&new Date(t.date).getMonth()===today.getMonth()&&new Date(t.date).getFullYear()===today.getFullYear());
+    return due&&!alreadyLogged;
+  });
+  const banner=document.getElementById('recurring-banner');
+  const listEl=document.getElementById('recurring-list-text');
+  if(due.length&&banner&&listEl){
+    banner.classList.add('show');
+    listEl.textContent=due.map(r=>r.title+' ('+fmt(r.amount)+')').join(', ');
+    banner._due=due;
+  }
+}
+function logAllRecurring(){
+  const banner=document.getElementById('recurring-banner');
+  const due=banner?._due||[];
+  const td=todayStr();
+  due.forEach(r=>{
+    if(!S.streakDays.includes(td)){S.streakDays.push(td);S.streak++;}
+    S.transactions.unshift({id:Date.now()+Math.random(),title:r.title,amount:r.amount,type:r.type,cat:r.cat,date:nowISO(),teammateId:r.teammateId,fromScan:false,recurring:true});
+  });
+  addXP(due.length*10,'Recurring transactions logged!');
+  dismissRecurring();
+  renderPage(currentPage);
+}
+function dismissRecurring(){
+  S.recurringDismissedDate=todayStr();
+  document.getElementById('recurring-banner').classList.remove('show');
+  persist();
+}
+
+/* ── BOSSES ──────────────────────────────────────────────── */
+function addBoss(){
+  const name=document.getElementById('b-name').value.trim();
+  const type=document.getElementById('b-type').value;
+  const total=parseFloat(document.getElementById('b-total').value)||0;
+  const paid=Math.min(parseFloat(document.getElementById('b-paid').value)||0,total);
+  const emi=parseFloat(document.getElementById('b-emi').value)||0;
+  if(!name||total<=0){toast('Enter boss name and total amount');return;}
+  S.bosses.push({id:Date.now(),name,type,total,paid,emi,defeated:paid>=total,emiPaidMonths:[]});
+  document.getElementById('b-name').value='';document.getElementById('b-total').value='';
+  document.getElementById('b-paid').value='';document.getElementById('b-emi').value='';
+  addXP(30,'New boss summoned!');renderBosses();persist();
+}
+function openBossAttack(id){
+  const b=S.bosses.find(x=>x.id===id);if(!b)return;
+  S.attackingBossId=id;
+  document.getElementById('boss-modal-title').textContent='Attack: '+b.name;
+  document.getElementById('boss-modal-sub').textContent='HP remaining: '+fmt(b.total-b.paid)+' — Deal damage with your payment!';
+  document.getElementById('boss-pay-amt').value=b.emi||'';
+  populateTmSelects();
+  document.getElementById('boss-overlay').classList.add('open');
+}
+function closeBossModal(){document.getElementById('boss-overlay').classList.remove('open');S.attackingBossId=null;}
+function confirmBossAttack(){
+  const b=S.bosses.find(x=>x.id===S.attackingBossId);if(!b)return;
+  const amt=parseFloat(document.getElementById('boss-pay-amt').value)||0;
+  // FIX: use selected account instead of hardcoded S.teammates[0]
+  const tmId=parseInt(document.getElementById('boss-pay-tm').value)||null;
+  if(amt<=0){toast('Enter a payment amount');return;}
+  const wasDefeated=b.defeated;
+  b.paid=Math.min(b.total,b.paid+amt);b.defeated=b.paid>=b.total;
+  S.transactions.unshift({id:Date.now(),title:'Loan payment: '+b.name,amount:amt,type:'expense',cat:'other',date:nowISO(),teammateId:tmId,teammateToId:null});
+  addXP(15,'Boss attacked!');
+  if(b.defeated&&!wasDefeated)addXP(100,'BOSS DEFEATED: '+b.name);
+  closeBossModal();renderBosses();renderEMI();persist();
+}
+function renderBosses(){
+  const el=document.getElementById('bosses-list');if(!el)return;
+  const alive=S.bosses.filter(b=>!b.defeated);
+  const dead=S.bosses.filter(b=>b.defeated);
+  if(!S.bosses.length){el.innerHTML='<div class="empty"><div class="empty-icon">👾</div><div class="empty-text">No bosses yet. Add your debts above!</div></div>';
+  } else {
+    let html='';
+    alive.forEach(b=>{
+      const bt=BOSS_TYPES[b.type]||BOSS_TYPES.other;
+      const pct=Math.min(100,Math.round((b.paid/b.total)*100));
+      const hp=100-pct;
+      const hpColor=hp>60?'#C62828':hp>30?'#E65100':'#2E7D32';
+      const months=b.emi>0?Math.ceil((b.total-b.paid)/b.emi):0;
+      html+=`<div class="boss-card">
+        <div class="boss-hdr">
+          <div class="boss-avatar" style="background:${bt.bg}">${bt.icon}</div>
+          <div style="flex:1"><div class="boss-name">${b.name}</div>
+          <div class="boss-sub">${b.type.replace('loan',' loan')} · EMI: ${b.emi?fmt(b.emi)+'/mo':'—'} · ~${months} mo left</div></div>
+          <div style="text-align:right"><div style="font-size:10px;color:var(--text2)">HP</div><div style="font-family:var(--fh);font-size:18px;font-weight:800;color:${hpColor}">${hp}%</div></div>
+        </div>
+        <div class="boss-hp-track"><div class="boss-hp-fill" style="width:${hp}%;background:${hpColor}"></div></div>
+        <div class="boss-stats">
+          <div class="boss-stat"><div class="boss-stat-val">${fmt(b.total)}</div><div class="boss-stat-label">Total</div></div>
+          <div class="boss-stat"><div class="boss-stat-val" style="color:var(--ruby)">${fmt(b.total-b.paid)}</div><div class="boss-stat-label">Remaining</div></div>
+          <div class="boss-stat"><div class="boss-stat-val" style="color:var(--green-d)">${fmt(b.paid)}</div><div class="boss-stat-label">Paid</div></div>
+          <div class="boss-stat"><div class="boss-stat-val">${pct}%</div><div class="boss-stat-label">Defeated</div></div>
+        </div>
+        <button class="boss-attack-btn" onclick="openBossAttack(${b.id})">⚔️ Attack — Make a payment</button>
+      </div>`;
+    });
+    if(dead.length){
+      html+=`<div style="font-family:var(--fh);font-size:13px;font-weight:700;color:var(--green-d);margin:14px 0 8px">Defeated bosses 💀</div>`;
+      dead.forEach(b=>{const bt=BOSS_TYPES[b.type]||BOSS_TYPES.other;html+=`<div class="boss-defeated"><div style="font-size:30px">${bt.icon}</div><div style="font-family:var(--fh);font-size:15px;font-weight:800;color:var(--green-d);margin-top:7px">${b.name} — DEFEATED!</div><div style="font-size:12px;color:var(--green-d);margin-top:3px">${fmt(b.total)} fully cleared</div></div>`;});
+    }
+    el.innerHTML=html;
+  }
+  // Update boss page stats
+  const active=S.bosses.filter(b=>b.emi>0&&!b.defeated);
+  const total=active.reduce((s,b)=>s+b.emi,0);
+  const totalRemain=S.bosses.filter(b=>!b.defeated).reduce((s,b)=>s+(b.total-b.paid),0);
+  if(document.getElementById('boss-emi-total'))document.getElementById('boss-emi-total').textContent=fmt(total);
+  if(document.getElementById('boss-emi-remaining'))document.getElementById('boss-emi-remaining').textContent=fmt(totalRemain);
+}
+
+/* ── EMI ─────────────────────────────────────────────────── */
+function renderEMI(){
+  const active=S.bosses.filter(b=>b.emi>0&&!b.defeated);
+  const total=active.reduce((s,b)=>s+b.emi,0);
+  const totalRemain=S.bosses.filter(b=>!b.defeated).reduce((s,b)=>s+(b.total-b.paid),0);
+  const nowKey=new Date().toISOString().slice(0,7);
+  const paidCount=active.filter(b=>b.emiPaidMonths?.includes(nowKey)).length;
+  if(document.getElementById('emi-total'))document.getElementById('emi-total').textContent=fmt(total);
+  if(document.getElementById('emi-count'))document.getElementById('emi-count').textContent=active.length;
+  if(document.getElementById('emi-remaining'))document.getElementById('emi-remaining').textContent=fmt(totalRemain);
+  if(document.getElementById('emi-paid-count'))document.getElementById('emi-paid-count').textContent=paidCount+'/'+active.length;
+  const sched=document.getElementById('emi-schedule');
+  if(sched){
+    sched.innerHTML=active.length?active.map(b=>{
+      const bt=BOSS_TYPES[b.type]||BOSS_TYPES.other;
+      const pct=Math.min(100,Math.round((b.paid/b.total)*100));
+      const months=b.emi>0?Math.ceil((b.total-b.paid)/b.emi):0;
+      return`<div class="emi-item">
+        <div style="width:34px;height:34px;border-radius:9px;background:${bt.bg};display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">${bt.icon}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:600">${b.name}</div>
+          <div style="font-size:10px;color:var(--text2);margin-top:1px">${pct}% paid · ~${months} months left</div>
+          <div class="emi-bar"><div class="emi-bar-fill" style="width:${pct}%;background:${bt.color||'var(--saffron)'}"></div></div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-family:var(--fh);font-size:14px;font-weight:700;color:var(--ruby)">${fmt(b.emi)}/mo</div>
+          <div style="font-size:10px;color:var(--text2)">${fmt(b.total-b.paid)} left</div>
+        </div>
+      </div>`;
+    }).join(''):'<div class="empty" style="padding:10px 0"><div class="empty-text">No active EMIs</div></div>';
+  }
+  const payList=document.getElementById('emi-pay-list');
+  if(payList){
+    payList.innerHTML=active.length?active.map(b=>{
+      const paid=b.emiPaidMonths?.includes(nowKey);
+      return`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:0.5px solid var(--border)">
+        <div style="font-size:16px">${BOSS_TYPES[b.type]?.icon||'💼'}</div>
+        <div style="flex:1"><div style="font-size:13px;font-weight:600">${b.name}</div><div style="font-size:10px;color:var(--text2)">${fmt(b.emi)} due this month</div></div>
+        <button class="btn btn-sm ${paid?'':'btn-primary'}" ${paid?'disabled':''} onclick="markEMIPaid(${b.id})">${paid?'✓ Paid':'Mark paid'}</button>
+      </div>`;
+    }).join(''):'<div class="empty" style="padding:10px 0"><div class="empty-text">No EMIs yet.</div></div>';
+  }
+}
+function markEMIPaid(id){
+  const b=S.bosses.find(x=>x.id===id);if(!b)return;
+  const key=new Date().toISOString().slice(0,7);
+  if(!b.emiPaidMonths)b.emiPaidMonths=[];
+  if(b.emiPaidMonths.includes(key)){toast('Already marked paid this month!');return;}
+  b.emiPaidMonths.push(key);b.paid=Math.min(b.total,b.paid+b.emi);b.defeated=b.paid>=b.total;
+  S.transactions.unshift({id:Date.now(),title:'EMI paid: '+b.name,amount:b.emi,type:'expense',cat:'other',date:nowISO(),teammateId:null});
+  addXP(25,'EMI paid!');if(b.defeated)addXP(100,'BOSS DEFEATED: '+b.name);
+  renderEMI();renderBosses();persist();
+}
+
+/* ── SAVINGS GARDEN ──────────────────────────────────────── */
+const PLANT_TYPES={flower:'🌸',tree:'🌳',cactus:'🌵',sunflower:'🌻',bamboo:'🎋',palm:'🌴'};
+function plantStatus(p){
+  if(p.saved>=p.target)return'done';
+  const d=daysSince(p.lastWatered);
+  if(d>=21)return'infested';if(d>=14)return'wilting';if(d>=7)return'dry';return'healthy';
+}
+function statusColor(s){return{healthy:'#4CAF50',dry:'#FFC107',wilting:'#FF7043',infested:'#B71C1C',done:'#D4AF37'}[s]||'#4CAF50';}
+
+function drawPlant(p,w,h){
+  const pct=Math.min(1,p.saved/p.target);
+  const st=plantStatus(p);
+  const stemC=st==='done'?'#558B2F':st==='infested'?'#5D4037':st==='wilting'?'#8D6E63':st==='dry'?'#9E9D24':'#558B2F';
+  const leafC=st==='done'?'#388E3C':st==='infested'?'#4E342E':st==='wilting'?'#A1887F':st==='dry'?'#AFB42B':'#4CAF50';
+  const flrC=st==='done'?'#E91E63':st==='infested'?'#8D6E63':st==='wilting'?'#FF7043':st==='dry'?'#FFA726':'#E91E63';
+  const cx=w/2,gy=h-8,plantH=Math.max(0.18,0.18+0.72*pct)*h,top=gy-plantH,sw=Math.max(3,3+pct*4.5);
+  const t=p.icon||'tree';
+  let s=`<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">`;
+  if(t==='bamboo'){
+    const segs=Math.max(2,Math.round(pct*6));const sh=plantH/segs;
+    for(let i=0;i<segs;i++){const sy=gy-i*sh;const ey=sy-sh;s+=`<rect x="${cx-5}" y="${ey}" width="10" height="${sh-3}" rx="3" fill="${leafC}"/>`;s+=`<rect x="${cx-7}" y="${ey+sh-5}" width="14" height="5" rx="2" fill="${stemC}"/>`;if(i%2===0&&pct>0.3)s+=`<ellipse cx="${cx+16}" cy="${ey+sh*0.4}" rx="13" ry="5" fill="${leafC}" transform="rotate(-20,${cx+16},${ey+sh*0.4})"/>`;if(i%2===1&&pct>0.4)s+=`<ellipse cx="${cx-16}" cy="${ey+sh*0.4}" rx="13" ry="5" fill="${leafC}" transform="rotate(20,${cx-16},${ey+sh*0.4})"/>`;}
+  } else if(t==='cactus'){
+    s+=`<rect x="${cx-8}" y="${top}" width="16" height="${plantH}" rx="8" fill="${leafC}"/>`;
+    if(pct>0.3)s+=`<rect x="${cx-21}" y="${top+plantH*0.3}" width="11" height="${plantH*0.33}" rx="5.5" fill="${leafC}"/>`;
+    if(pct>0.5)s+=`<rect x="${cx+10}" y="${top+plantH*0.45}" width="11" height="${plantH*0.28}" rx="5.5" fill="${leafC}"/>`;
+    if(pct>0.65)s+=`<ellipse cx="${cx}" cy="${top}" rx="8" ry="6" fill="${flrC}"/>`;
+    if(st!=='infested')for(let i=0;i<3;i++){const sy=top+plantH*(0.2+i*0.28);s+=`<line x1="${cx-8}" y1="${sy}" x2="${cx-13}" y2="${sy-3}" stroke="#90A4AE" stroke-width="1.5"/><line x1="${cx+8}" y1="${sy}" x2="${cx+13}" y2="${sy-3}" stroke="#90A4AE" stroke-width="1.5"/>`;}
+  } else if(t==='palm'){
+    s+=`<path d="M${cx} ${gy} Q${cx+5} ${gy-plantH*0.5} ${cx} ${top}" stroke="${stemC}" stroke-width="${sw}" fill="none" stroke-linecap="round"/>`;
+    if(pct>0.2){const ll=Math.round(3+pct*4);for(let i=0;i<ll;i++){const ang=(-60+i*(120/(ll-1)))*Math.PI/180;const ln=20+pct*22;s+=`<path d="M${cx} ${top} Q${cx+Math.cos(ang)*ln*.5} ${top+Math.sin(ang)*ln*.5-6} ${cx+Math.cos(ang)*ln} ${top+Math.sin(ang)*ln}" stroke="${leafC}" stroke-width="4" fill="none" stroke-linecap="round"/>`;}}
+  } else if(t==='sunflower'){
+    s+=`<line x1="${cx}" y1="${gy}" x2="${cx}" y2="${top}" stroke="${stemC}" stroke-width="${sw}" stroke-linecap="round"/>`;
+    if(pct>0.3)s+=`<path d="M${cx} ${gy-plantH*0.3} Q${cx-16} ${gy-plantH*0.45} ${cx-20} ${gy-plantH*0.58}" stroke="${leafC}" stroke-width="4" fill="none"/><ellipse cx="${cx-20}" cy="${gy-plantH*0.6}" rx="8" ry="5" fill="${leafC}" transform="rotate(-30,${cx-20},${gy-plantH*0.6})"/>`;
+    if(pct>0.55){const r=Math.round(7+pct*9);for(let i=0;i<8;i++){const a=(i/8)*2*Math.PI;s+=`<ellipse cx="${cx+Math.cos(a)*(r+3)}" cy="${top+Math.sin(a)*(r+3)}" rx="5" ry="3" fill="${flrC}" transform="rotate(${i*45},${cx+Math.cos(a)*(r+3)},${top+Math.sin(a)*(r+3)})"/>`;}s+=`<circle cx="${cx}" cy="${top}" r="${r}" fill="${st==='infested'?'#5D4037':'#F57F17'}"/>`;s+=`<circle cx="${cx}" cy="${top}" r="${Math.max(3,r-4)}" fill="${st==='infested'?'#4E342E':'#FF8F00'}"/>`;}
+  } else if(t==='flower'){
+    s+=`<line x1="${cx}" y1="${gy}" x2="${cx}" y2="${top}" stroke="${stemC}" stroke-width="${sw}" stroke-linecap="round"/>`;
+    if(pct>0.2)s+=`<ellipse cx="${cx-11}" cy="${gy-plantH*0.4}" rx="8" ry="5" fill="${leafC}" transform="rotate(-30,${cx-11},${gy-plantH*0.4})"/>`;
+    if(pct>0.4)s+=`<ellipse cx="${cx+11}" cy="${gy-plantH*0.55}" rx="8" ry="5" fill="${leafC}" transform="rotate(30,${cx+11},${gy-plantH*0.55})"/>`;
+    if(pct>0.52){const r=Math.round(6+pct*9);for(let i=0;i<6;i++){const a=(i/6)*2*Math.PI;s+=`<ellipse cx="${cx+Math.cos(a)*(r+3)}" cy="${top+Math.sin(a)*(r+3)}" rx="5" ry="3" fill="${flrC}" transform="rotate(${i*60},${cx+Math.cos(a)*(r+3)},${top+Math.sin(a)*(r+3)})"/>`;}s+=`<circle cx="${cx}" cy="${top}" r="${Math.max(4,r-2)}" fill="${st==='infested'?'#795548':flrC}"/>`;}
+  } else {
+    s+=`<line x1="${cx}" y1="${gy}" x2="${cx}" y2="${top}" stroke="${stemC}" stroke-width="${sw}" stroke-linecap="round"/>`;
+    if(pct>0.15)s+=`<path d="M${cx} ${gy-plantH*0.3} L${cx-18} ${gy-plantH*0.44} L${cx} ${gy-plantH*0.38} Z" fill="${leafC}"/>`;
+    if(pct>0.35)s+=`<path d="M${cx} ${gy-plantH*0.5} L${cx+18} ${gy-plantH*0.6} L${cx} ${gy-plantH*0.55} Z" fill="${leafC}"/>`;
+    const cr=Math.round(9+pct*20);s+=`<circle cx="${cx}" cy="${top}" r="${cr}" fill="${leafC}"/>`;
+    if(pct>0.5)s+=`<circle cx="${cx-cr*.5}" cy="${top+cr*.3}" r="${cr*.65}" fill="${leafC}"/><circle cx="${cx+cr*.5}" cy="${top+cr*.3}" r="${cr*.65}" fill="${leafC}"/>`;
+    if(st==='done')s+=`<circle cx="${cx}" cy="${top-cr+2}" r="6" fill="#FFC107"/>`;
+  }
+  if(st==='done'){s+=`<text x="${cx-16}" y="${top-14}" font-size="11" text-anchor="middle">✨</text><text x="${cx+16}" y="${top-9}" font-size="10" text-anchor="middle">⭐</text>`;}
+  if(st==='infested'){s+=`<text x="${cx-10}" y="${top+plantH*0.28}" font-size="10">🐛</text><text x="${cx+7}" y="${top+plantH*0.52}" font-size="9">🦗</text>`;}
+  if(st==='wilting'||st==='dry')s+=`<text x="${cx+8}" y="${top-4}" font-size="9" opacity=".7">💧</text>`;
+  s+='</svg>';return s;
+}
+
+function addPlant(){
+  const name=document.getElementById('g-name').value.trim();
+  const target=parseFloat(document.getElementById('g-target').value)||0;
+  const icon=document.getElementById('g-type').value;
+  const monthly=parseFloat(document.getElementById('g-monthly').value)||0;
+  if(!name||target<=0){toast('Enter goal name and target');return;}
+  S.plants.push({id:Date.now(),name,target,icon,monthly,saved:0,lastWatered:null});
+  document.getElementById('g-name').value='';document.getElementById('g-target').value='';document.getElementById('g-monthly').value='';
+  addXP(20,'New savings goal planted!');renderGarden();persist();
+}
+function openWaterModal(id){
+  const p=S.plants.find(x=>x.id===id);if(!p)return;
+  S.wateringPlantId=id;
+  document.getElementById('water-modal-title').textContent='Water: '+p.name;
+  document.getElementById('water-plant-svg').innerHTML=drawPlant(p,60,90);
+  document.getElementById('water-amt').value=p.monthly||'';
+  document.getElementById('water-saved-label').textContent='Saved: '+fmt(p.saved);
+  document.getElementById('water-target-label').textContent='Goal: '+fmt(p.target);
+  const pct=Math.min(100,Math.round((p.saved/p.target)*100));
+  document.getElementById('water-progress-bar').style.width=pct+'%';
+  document.getElementById('water-modal-sub').textContent=p.saved>=p.target?'Goal achieved!':fmt(p.target-p.saved)+' more to reach your goal.';
+  document.getElementById('water-overlay').classList.add('open');
+}
+function closeWaterModal(){document.getElementById('water-overlay').classList.remove('open');S.wateringPlantId=null;}
+function confirmWater(){
+  const p=S.plants.find(x=>x.id===S.wateringPlantId);if(!p)return;
+  const amt=parseFloat(document.getElementById('water-amt').value)||0;
+  if(amt<=0){toast('Enter an amount');return;}
+  const wasDone=p.saved>=p.target;
+  p.saved=Math.min(p.target,p.saved+amt);p.lastWatered=nowISO();S.simOffset=0;
+  if(p.saved>=p.target&&!wasDone)addXP(150,'GOAL REACHED: '+p.name);
+  else addXP(20,'Plant watered!');
+  closeWaterModal();renderGarden();persist();
+}
+function simGardenDays(d){
+  S.simOffset=d;
+  if(d===0){S.plants.forEach(p=>{if(p.lastWatered)p.lastWatered=nowISO();});S.simOffset=0;}
+  persist();renderGarden();if(d>0)toast('Simulated '+d+' days without watering');
+}
+function renderGarden(){
+  const el=document.getElementById('plants-row');if(!el)return;
+  const banner=document.getElementById('bug-banner');
+  if(!S.plants.length){el.innerHTML='<div style="text-align:center;color:#4CAF50;font-size:13px;padding:40px 0;width:100%">No plants yet.</div>';banner.classList.remove('show');document.getElementById('plant-list-card').style.display='none';updateGardenStats();return;}
+  const infested=S.plants.filter(p=>plantStatus(p)==='infested');
+  const wilting=S.plants.filter(p=>plantStatus(p)==='wilting');
+  if(infested.length){banner.classList.add('show');document.getElementById('bug-title').textContent='Bugs are attacking your farm!';document.getElementById('bug-sub').textContent=infested.map(p=>p.name).join(', ')+' need water NOW!';}
+  else if(wilting.length){banner.classList.add('show');document.getElementById('bug-title').textContent='Plants wilting!';document.getElementById('bug-sub').textContent=wilting.map(p=>p.name).join(', ')+' need water urgently!';}
+  else banner.classList.remove('show');
+  el.innerHTML=S.plants.map(p=>{
+    const st=plantStatus(p);const pct=Math.min(100,Math.round((p.saved/p.target)*100));
+    const w=S.plants.length<=4?72:S.plants.length<=6?62:54;const h=Math.round(w*2);
+    let warn='';
+    if(st==='infested')warn='<div class="plant-warning-icon" style="font-size:16px">🚨</div>';
+    else if(st==='wilting')warn='<div class="plant-warning-icon">⚠️</div>';
+    else if(st==='dry')warn='<div class="plant-warning-icon" style="font-size:12px">💧</div>';
+    else if(st==='done')warn='<div class="plant-warning-icon" style="animation:none;font-size:13px">🏆</div>';
+    return`<div class="plant-wrap" onclick="openWaterModal(${p.id})">${warn}<div style="width:${w}px;height:${h}px">${drawPlant(p,w,h)}</div><div class="plant-label-text">${p.name}</div><div class="plant-pct-text" style="color:${statusColor(st)}">${pct}%${st==='done'?' ✓':''}</div></div>`;
+  }).join('');
+  const plc=document.getElementById('plant-list-card');plc.style.display='block';
+  document.getElementById('plant-list').innerHTML=S.plants.map(p=>{
+    const st=plantStatus(p);const pct=Math.min(100,Math.round((p.saved/p.target)*100));
+    const dTxt=p.lastWatered?(daysSince(p.lastWatered)===0?'Watered today':daysSince(p.lastWatered)+' days ago'):'Never watered';
+    const pillClasses={healthy:'background:#E8F5E9;color:#1B5E20',dry:'background:#FFF8E1;color:#F57F17',wilting:'background:#FFF3E8;color:#E65100',infested:'background:#FFEBEE;color:#B71C1C',done:'background:#FFFDE7;color:#795900'};
+    return`<div class="plant-list-item">
+      <div style="width:38px;height:50px;flex-shrink:0">${drawPlant(p,38,50)}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:600">${p.name}</div>
+        <div style="font-size:10px;color:var(--text2);margin-top:1px">${fmt(p.saved)} / ${fmt(p.target)} · ${dTxt}</div>
+        <div class="plant-progress-bar"><div class="plant-progress-fill" style="width:${pct}%;background:${statusColor(st)}"></div></div>
+      </div>
+      <div style="text-align:right;flex-shrink:0;margin-left:8px">
+        <div class="status-pill" style="${pillClasses[st]||''};border-radius:10px;padding:2px 8px;font-size:9px;font-weight:600">${st}</div>
+        <button class="btn btn-sm btn-green" style="margin-top:5px" onclick="event.stopPropagation();openWaterModal(${p.id})">💧 Water</button>
+      </div>
+    </div>`;
+  }).join('');
+  updateGardenStats();
+}
+function updateGardenStats(){
+  const ts=S.plants.reduce((s,p)=>s+p.saved,0);
+  const done=S.plants.filter(p=>plantStatus(p)==='done').length;
+  const healthy=S.plants.filter(p=>plantStatus(p)==='healthy').length;
+  const nw=S.plants.filter(p=>['dry','wilting','infested'].includes(plantStatus(p))).length;
+  if(document.getElementById('g-total-saved'))document.getElementById('g-total-saved').textContent=fmt(ts);
+  if(document.getElementById('g-goals-done'))document.getElementById('g-goals-done').textContent=done;
+  if(document.getElementById('g-healthy'))document.getElementById('g-healthy').textContent=healthy;
+  if(document.getElementById('g-need-water'))document.getElementById('g-need-water').textContent=nw;
+}
+
+/* ── SCAN INVOICE — FIX: context-aware, no duplicate IDs ── */
+function scanEl(ctx,id){return document.getElementById(ctx+'-'+id);}
+
+async function handleScan(event,ctx){
+  const file=event.target.files[0];if(!file)return;
+  // File size guard
+  if(file.size>5*1024*1024){toast('File too large (max 5MB)');event.target.value='';return;}
+  scanEl(ctx,'scan-loading').style.display='block';
+  scanEl(ctx,'scan-result').style.display='none';
+  scanEl(ctx,'scan-error').style.display='none';
+  try{
+    const base64=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(',')[1]);r.onerror=()=>rej(new Error('File read failed'));r.readAsDataURL(file);});
+    const isImg=file.type.startsWith('image/');const isPdf=file.type==='application/pdf';
+    const block=isPdf?{type:'document',source:{type:'base64',media_type:'application/pdf',data:base64}}:isImg?{type:'image',source:{type:'base64',media_type:file.type,data:base64}}:null;
+    if(!block)throw new Error('Unsupported file type. Use JPG, PNG or PDF.');
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:800,messages:[{role:'user',content:[block,{type:'text',text:'Analyze this Indian bill/receipt/invoice. Respond ONLY in JSON (no markdown, no backticks):\n{"merchant":"name","amount":number,"category":"food|transport|shopping|entertainment|bills|health|education|investment|income|other","type":"expense|income","notes":"one friendly insight"}\nRules: amount is a plain number. Use grand total.'}]}]})});
+    if(!resp.ok){const e=await resp.json().catch(()=>({}));throw new Error(e.error?.message||'API error '+resp.status);}
+    const data=await resp.json();
+    const raw=data.content.filter(c=>c.type==='text').map(c=>c.text).join('');
+    let parsed;
+    try{parsed=JSON.parse(raw.replace(/```json|```/g,'').trim());}
+    catch(e){const m=raw.match(/\{[\s\S]*\}/);if(m)parsed=JSON.parse(m[0]);else throw new Error('Could not parse response');}
+    scanEl(ctx,'scan-loading').style.display='none';
+    scanEl(ctx,'scan-result').style.display='block';
+    scanEl(ctx,'s-title').value=parsed.merchant||'';
+    scanEl(ctx,'s-amount').value=parsed.amount||'';
+    if(parsed.category)scanEl(ctx,'s-cat').value=parsed.category;
+    scanEl(ctx,'s-type').value=parsed.type||'expense';
+    populateTmSelects();
+    const notes=scanEl(ctx,'s-notes');
+    if(parsed.notes){notes.textContent='💡 '+parsed.notes;notes.style.display='block';}else notes.style.display='none';
+    S.scanCount++;checkBadges();persist();
+  }catch(e){
+    scanEl(ctx,'scan-loading').style.display='none';
+    const err=scanEl(ctx,'scan-error');err.textContent='Could not read: '+e.message;err.style.display='block';
+  }
+  event.target.value='';
+}
+function saveScan(ctx){
+  const title=scanEl(ctx,'s-title').value.trim();
+  const amount=parseFloat(scanEl(ctx,'s-amount').value)||0;
+  const cat=scanEl(ctx,'s-cat').value;
+  const type=scanEl(ctx,'s-type').value;
+  const tmSel=scanEl(ctx,'s-teammate');
+  const teammateId=tmSel&&tmSel.value?parseInt(tmSel.value):null;
+  if(!title||amount<=0){toast('Fill in title and amount');return;}
+  const td=todayStr();if(!S.streakDays.includes(td)){S.streakDays.push(td);S.streak++;}
+  S.transactions.unshift({id:Date.now(),title,amount,type,cat,date:nowISO(),teammateId,fromScan:true});
+  addXP(25,'Invoice scanned & saved!');cancelScan(ctx);
+  if(ctx==='modal')closeTxModal();
+  showPage('transactions');persist();
+}
+function cancelScan(ctx){
+  scanEl(ctx,'scan-result').style.display='none';
+  scanEl(ctx,'scan-error').style.display='none';
+  scanEl(ctx,'scan-loading').style.display='none';
+}
+
+/* ── QUESTS ──────────────────────────────────────────────── */
+function checkQuests(){
+  QUESTS_DEF.forEach(q=>{
+    if(S.completedQuests.includes(q.id))return;
+    let done=false;
+    if(q.type==='spend_total')done=S.transactions.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0)>=q.target;
+    else if(q.type==='streak')done=S.streak>=q.target;
+    else if(q.type==='scan_count')done=S.scanCount>=q.target;
+    else if(q.type==='cat_limit'){const now=new Date();const spent=S.transactions.filter(t=>t.type==='expense'&&t.cat===q.cat&&new Date(t.date).getMonth()===now.getMonth()).reduce((s,t)=>s+t.amount,0);done=spent>0&&spent<=q.limit;}
+    else if(q.type==='boss_defeated')done=S.bosses.some(b=>b.defeated);
+    else if(q.type==='plants')done=S.plants.length>=q.target;
+    else if(q.type==='teammates')done=S.teammates.length>=q.target;
+    if(done){S.completedQuests.push(q.id);addXP(q.xp,'Quest complete: '+q.name);}
+  });
+}
+// FIX: renderQuests now takes explicit container ID prefix
+function renderQuests(prefix){
+  const pre=prefix||'ach';
+  const qActive=document.getElementById(pre+'-quests-active');
+  const qDone=document.getElementById(pre+'-quests-done');
+  if(!qActive||!qDone)return;
+  const active=QUESTS_DEF.filter(q=>!S.completedQuests.includes(q.id));
+  const done=QUESTS_DEF.filter(q=>S.completedQuests.includes(q.id));
+  if(!active.length){qActive.innerHTML='<div class="empty" style="padding:10px 0"><div class="empty-text">All quests complete! 🎉</div></div>';}
+  else qActive.innerHTML=active.map(q=>{
+    let prog=0,max=q.target||1,label='';
+    if(q.type==='spend_total'){prog=S.transactions.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);label=fmt(Math.min(prog,max))+' / '+fmt(max);}
+    else if(q.type==='streak'){prog=S.streak;label=prog+' / '+max+' days';}
+    else if(q.type==='scan_count'){prog=S.scanCount;label=prog+' / '+max+' scans';}
+    else if(q.type==='cat_limit'){const now=new Date();prog=S.transactions.filter(t=>t.type==='expense'&&t.cat===q.cat&&new Date(t.date).getMonth()===now.getMonth()).reduce((s,t)=>s+t.amount,0);label=(prog<=q.limit?'On track: ':'Over: ')+fmt(prog);prog=prog<=q.limit?q.limit:0;max=q.limit;}
+    else if(q.type==='boss_defeated'){prog=S.bosses.filter(b=>b.defeated).length;label=prog+' boss(es) defeated';max=1;}
+    else if(q.type==='plants'){prog=S.plants.length;label=prog+' / '+max+' plants';}
+    else if(q.type==='teammates'){prog=S.teammates.length;label=prog+' / '+max+' teammates';}
+    const pct=Math.min(100,Math.round((prog/max)*100));
+    return`<div class="quest-item"><div class="quest-icon-wrap" style="background:var(--saffron-l)">${q.icon}</div><div style="flex:1;min-width:0"><div class="quest-name">${q.name}</div><div class="quest-desc">${label}</div><div class="quest-bar"><div class="quest-bar-fill" style="width:${pct}%"></div></div></div><div class="quest-xp">+${q.xp} XP</div></div>`;
+  }).join('');
+  qDone.innerHTML=done.length?done.map(q=>`<div class="quest-item"><div class="quest-icon-wrap" style="background:var(--green-l)">${q.icon}</div><div style="flex:1"><div class="quest-name">${q.name}</div><div class="quest-desc" style="color:var(--green-d)">Completed! ✓</div></div><div class="quest-xp" style="color:var(--green-d)">+${q.xp} XP</div></div>`).join(''):'<div class="empty" style="padding:10px 0"><div class="empty-text">Complete quests to see them here</div></div>';
+}
+
+/* ── BADGES ──────────────────────────────────────────────── */
+function checkBadges(){
+  const chk=(id,cond)=>{if(!S.earnedBadges.includes(id)&&cond){S.earnedBadges.push(id);toast('Badge unlocked: '+BADGES_DEF.find(b=>b.id===id)?.name||id);persist();}};
+  chk('first_tx',S.transactions.length>=1);
+  chk('scan_1',S.scanCount>=1);
+  chk('boss_added',S.bosses.length>=1);
+  chk('boss_defeated',S.bosses.some(b=>b.defeated));
+  chk('all_bosses',S.bosses.length>0&&S.bosses.every(b=>b.defeated));
+  chk('plant_1',S.plants.length>=1);
+  chk('plant_full',S.plants.some(p=>p.saved>=p.target));
+  chk('first_tm',S.teammates.length>=1);
+  chk('team_3',S.teammates.length>=3);
+  chk('streak_7',S.streak>=7);chk('streak_30',S.streak>=30);
+  chk('invest_1',S.transactions.some(t=>t.cat==='investment'));
+  chk('transfer_1',S.transactions.some(t=>t.type==='transfer'));
+  chk('quests_3',S.completedQuests.length>=3);
+  const net=S.transactions.reduce((s,t)=>t.type==='income'?s+t.amount:t.type==='expense'?s-t.amount:s,0);
+  chk('save_10k',net>=10000);
+}
+// FIX: renderBadges takes explicit container ID
+function renderBadges(containerId){
+  const id=containerId||'ach-badge-grid';
+  const el=document.getElementById(id);if(!el)return;
+  el.innerHTML=BADGES_DEF.map(b=>{const e=S.earnedBadges.includes(b.id);return`<div class="badge ${e?'earned':''}" title="${b.desc||''}">${e?'<div class="badge-earned-dot"></div>':''}<div class="badge-icon-b">${b.icon}</div><div class="badge-name-b">${b.name}</div></div>`;}).join('');
+}
+
+/* ── ACHIEVEMENTS (FIX: uses unique IDs) ─────────────────── */
+function renderAchievements(){
+  renderQuests('ach');
+  renderBadges('ach-badge-grid');
+}
+
+/* ── REPORTS (FIX: destroy charts before recreating) ──────── */
+function renderReports(){
+  // Guard — only render if page is active
+  if(!document.getElementById('page-reports')?.classList.contains('active'))return;
+  renderBudgetSettings();
+  renderRecurringList();
+
+  const now=new Date();
+  const catTotals={};
+  S.transactions.filter(t=>t.type==='expense').forEach(t=>{catTotals[t.cat]=(catTotals[t.cat]||0)+t.amount;});
+
+  const pieCtx=document.getElementById('expense-pie');
+  if(pieCtx&&Object.keys(catTotals).length){
+    const labels=Object.keys(catTotals);
+    const data=Object.values(catTotals);
+    // FIX: destroy before creating
+    createChart('expense-pie',pieCtx.getContext('2d'),{
+      type:'pie',
+      data:{labels,datasets:[{data,backgroundColor:labels.map(l=>CATS[l]?.color||'#546E7A')}]},
+      options:{plugins:{legend:{position:'bottom',labels:{font:{size:10}}}}}
+    });
+  }
+
+  const lineCtx=document.getElementById('income-expense-line');
+  if(lineCtx){
+    const monthly={};
+    S.transactions.forEach(t=>{
+      const d=new Date(t.date);const m=d.getFullYear()+'-'+(d.getMonth()+1).toString().padStart(2,'0');
+      if(!monthly[m])monthly[m]={income:0,expense:0};
+      if(t.type==='income')monthly[m].income+=t.amount;
+      else if(t.type==='expense')monthly[m].expense+=t.amount;
+    });
+    const labels2=Object.keys(monthly).sort();
+    // FIX: destroy before creating
+    createChart('income-expense-line',lineCtx.getContext('2d'),{
+      type:'line',
+      data:{labels:labels2,datasets:[
+        {label:'Income',data:labels2.map(m=>monthly[m].income),borderColor:'#138808',backgroundColor:'rgba(19,136,8,0.1)',fill:true,tension:0.3},
+        {label:'Expense',data:labels2.map(m=>monthly[m].expense),borderColor:'#C62828',backgroundColor:'rgba(198,40,40,0.1)',fill:true,tension:0.3}
+      ]},
+      options:{plugins:{legend:{position:'bottom'}},scales:{y:{beginAtZero:true}}}
+    });
+  }
+
+  // Spending alerts (budget)
+  let alerts='';
+  Object.entries(S.budgets).forEach(([cat,limit])=>{
+    const spent=S.transactions.filter(t=>t.type==='expense'&&t.cat===cat&&new Date(t.date).getMonth()===now.getMonth()).reduce((s,t)=>s+t.amount,0);
+    if(spent>limit)alerts+=`<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:0.5px solid var(--border)"><span style="font-size:16px">${CATS[cat]?.icon||'📦'}</span><span style="font-size:12px;flex:1">${cat}</span><span style="font-size:12px;font-weight:700;color:var(--ruby)">Overspent: ${fmt(spent)} / ${fmt(limit)}</span></div>`;
+  });
+  document.getElementById('spending-alerts').innerHTML=alerts||'<div style="font-size:12px;color:var(--text2);padding:8px 0">No budget alerts. 🎉 You\'re on track!</div>';
+}
+
+/* ── DASHBOARD ───────────────────────────────────────────── */
+function renderDashboard(){
+  const now=new Date();
+  const mTx=S.transactions.filter(t=>{const d=new Date(t.date);return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();});
+  const inc=mTx.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
+  const spd=mTx.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
+  const sav=inc>0?Math.round(((inc-spd)/inc)*100):0;
+  const netWorth=S.teammates.reduce((s,tm)=>s+getTmBalance(tm),0);
+
+  document.getElementById('d-networth').textContent=fmt(netWorth);
+  document.getElementById('d-networth').style.color=netWorth>=0?'var(--green-d)':'var(--ruby)';
+  document.getElementById('d-income').textContent=fmt(inc);
+  document.getElementById('d-expenses').textContent=fmt(spd);
+  document.getElementById('d-savings').textContent=sav+'%';
+  document.getElementById('d-savings').style.color=sav>=30?'var(--green-d)':sav>=15?'var(--saffron)':'var(--ruby)';
+
+  // FIX: locale-safe streak using ISO date
+  const today=new Date();
+  const monday=new Date(today);monday.setDate(today.getDate()-((today.getDay()+6)%7));
+  const dayL=['M','T','W','T','F','S','S'];
+  document.getElementById('streak-row').innerHTML=dayL.map((_,i)=>{
+    const d=new Date(monday);d.setDate(monday.getDate()+i);
+    const ds=d.toISOString().split('T')[0];
+    const td=today.toISOString().split('T')[0];
+    const isDone=S.streakDays.includes(ds);
+    const isTod=ds===td;
+    return`<div class="streak-day ${isDone?'done':''} ${isTod&&!isDone?'today':''}">${dayL[i]}</div>`;
+  }).join('');
+  document.getElementById('streak-count').textContent=S.streak+' days';
+
+  // Team snapshot
+  const ts=document.getElementById('d-team-snapshot');
+  if(!S.teammates.length)ts.innerHTML='<div class="empty" style="padding:10px 0"><div class="empty-text">No accounts yet.</div></div>';
+  else ts.innerHTML=S.teammates.map(tm=>{const bal=getTmBalance(tm);return`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:0.5px solid var(--border)"><div style="width:30px;height:30px;border-radius:8px;background:${tm.color}22;display:flex;align-items:center;justify-content:center;font-size:14px">${tm.icon}</div><div style="flex:1"><div style="font-size:13px;font-weight:600">${tm.name}</div><div style="font-size:10px;color:var(--text2)">${TM_TYPES[tm.type]||tm.type}</div></div><div style="font-family:var(--fh);font-size:14px;font-weight:700;color:${bal>=0?'var(--green-d)':'var(--ruby)'}">${fmt(bal)}</div></div>`;}).join('');
+
+  // Category breakdown with budget indicators
+  const catTotals={};mTx.filter(t=>t.type==='expense').forEach(t=>{catTotals[t.cat]=(catTotals[t.cat]||0)+t.amount;});
+  const total=Object.values(catTotals).reduce((s,v)=>s+v,0);
+  const cb=document.getElementById('d-cat-breakdown');
+  if(!total)cb.innerHTML='<div class="empty" style="padding:8px 0"><div class="empty-text">Add expenses to see breakdown</div></div>';
+  else cb.innerHTML=Object.entries(catTotals).sort((a,b)=>b[1]-a[1]).map(([cat,amt])=>{
+    const c=CATS[cat]||CATS.other;const pct=Math.round((amt/total)*100);
+    const budget=S.budgets[cat];
+    const budgetPct=budget?Math.min(100,Math.round((amt/budget)*100)):null;
+    const barColor=budgetPct?(budgetPct>=100?'#C62828':budgetPct>=80?'#E65100':c.color):c.color;
+    const overChip=budget&&amt>budget?`<span class="budget-over">Over budget!</span>`:'';
+    return`<div style="margin-bottom:9px">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px">
+        <span>${c.icon} ${cat}${overChip}</span>
+        <span style="font-weight:600">${fmt(amt)} <span style="color:var(--text2);font-weight:400">(${pct}%)</span>${budget?` of ${fmt(budget)} budget`:''}</span>
+      </div>
+      <div class="budget-bar"><div class="budget-bar-fill" style="width:${budgetPct||pct}%;background:${barColor}"></div></div>
+    </div>`;
+  }).join('');
+
+  // Recent txns
+  renderTxList('d-recent-txns',6);
+  checkRecurring();
+}
+
+/* ── SEED DATA ───────────────────────────────────────────── */
+function seedDemoData(){
+  S.teammates=[
+    {id:1001,name:'SBI Savings',type:'bank',balance:80000,initialBalance:80000,color:'#1565C0',icon:'🏦'},
+    {id:1002,name:'Cash wallet',type:'cash',balance:5000,initialBalance:5000,color:'#2E7D32',icon:'💵'},
+    {id:1003,name:'HDFC Credit',type:'credit',balance:0,initialBalance:0,color:'#C62828',icon:'💳'},
+  ];
+  S.bosses=[
+    {id:3001,name:'Car loan',type:'carloan',total:450000,paid:180000,emi:9500,defeated:false,emiPaidMonths:[]},
+    {id:3002,name:'Personal loan',type:'personal',total:100000,paid:60000,emi:5000,defeated:false,emiPaidMonths:[]},
+  ];
+  const n=nowISO();
+  S.transactions=[
+    {id:2001,title:'Monthly salary',amount:75000,type:'income',cat:'income',date:n,teammateId:1001},
+    {id:2002,title:'Swiggy dinner',amount:480,type:'expense',cat:'food',date:n,teammateId:1003},
+    {id:2003,title:'Petrol fill',amount:1200,type:'expense',cat:'transport',date:n,teammateId:1002},
+    {id:2004,title:'Transfer to cash',amount:3000,type:'transfer',cat:'other',date:n,teammateId:1001,teammateToId:1002},
+    {id:2005,title:'Electricity bill',amount:1800,type:'expense',cat:'bills',date:n,teammateId:1001},
+    {id:2006,title:'Blinkit groceries',amount:2200,type:'expense',cat:'food',date:n,teammateId:1003},
+  ];
+  S.plants=[
+    {id:4001,name:'Goa trip',target:40000,icon:'palm',monthly:5000,saved:18000,lastWatered:n},
+    {id:4002,name:'Emergency fund',target:120000,icon:'cactus',monthly:10000,saved:55000,lastWatered:n},
+    {id:4003,name:'New laptop',target:70000,icon:'flower',monthly:8000,saved:7000,lastWatered:n},
+  ];
+  S.recurringTx=[
+    {id:5001,title:'Netflix',amount:649,cat:'entertainment',type:'expense',day:5,teammateId:1003},
+    {id:5002,title:'SIP investment',amount:5000,cat:'investment',type:'expense',day:1,teammateId:1001},
+  ];
+  S.budgets={food:5000,transport:2000,entertainment:1500};
+  S.xp=180;S.streak=3;S.streakDays=[todayStr()];
+}
+
+/* ── BOOT ────────────────────────────────────────────────── */
+hydrate();
+
+// FIX: onboarding gate — only show if not yet onboarded
+if(!S.hasOnboarded){
+  document.getElementById('onboard-overlay').style.display='flex';
+} else {
+  renderDashboard();
+  checkBadges();
+}
+
+updateXPDisplay();
+
+// Live clock — FIX: element exists by now
+setInterval(()=>{
+  const now=new Date();
+  const el=document.getElementById('header-time');
+  if(el)el.textContent=now.toLocaleDateString('en-IN',{day:'numeric',month:'short'})+' '+now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+},1000);
+// Fire immediately
+(()=>{const now=new Date();const el=document.getElementById('header-time');if(el)el.textContent=now.toLocaleDateString('en-IN',{day:'numeric',month:'short'})+' '+now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});})();
+</script>
+</body>
+</html>
